@@ -45,6 +45,6 @@ public class Fox extends Predator {
 
     @Override
     public Animal createNewInstance(Field field, int x, int y) {
-        return null;
+        return new Fox(field, x, y);
     }
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import simulation.entity.Entity;
 import simulation.Field;
 import simulation.entity.Point;
+import simulation.exception.TooMuchEntitiesException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public abstract class Animal extends Entity {
         if (canEat(entity)) {
             double chance = getChanceToEat(entity);
             if (randomEat(chance)) {
-                log.debug("{} eats {}", this, entity);
+                log.info("{} eats {}", this, entity);
                 entity.die();
                 weight += entity.getWeight();
                 return entity.getWeight();
@@ -51,7 +52,7 @@ public abstract class Animal extends Entity {
     }
 
     protected boolean canEat(Entity entity) {
-        return chances.get(entity.getClass()) != null;
+        return chances.get(entity.getClass()) != null && entity.isAlive();
     }
 
     protected abstract void populateChancesMap();
@@ -72,8 +73,12 @@ public abstract class Animal extends Entity {
         if (this.getClass().equals(entity.getClass())) {
             Animal other = (Animal) entity;
             if (this.point.equals(other.point)) {
-                log.debug("{} multiply with {}", this, entity);
-                field.addEntity(point.x(), point.y(), createNewInstance(this.field, point.x(), point.y()));
+                log.info("{} multiply with {}", this, entity);
+                try {
+                    field.addEntity(point.x(), point.y(), createNewInstance(this.field, point.x(), point.y()));
+                } catch (TooMuchEntitiesException e) {
+                    log.debug("{} wasn't added after multiplication because it is already too much of it", entity);
+                }
             }
         }
     }
@@ -109,7 +114,7 @@ public abstract class Animal extends Entity {
         loseWeight();
 
         if (!checkDeathFromHunger()) {
-            field.moveEntity(x, y, this);
+            field.moveEntity(point, new Point(x, y), this);
         }
     }
 

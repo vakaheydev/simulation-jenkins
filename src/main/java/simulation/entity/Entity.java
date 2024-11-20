@@ -37,7 +37,7 @@ public abstract class Entity {
     }
 
     public void die() {
-        log.info("{} dies", this);
+        log.debug("{} dies", this);
         field.removeEntity(this);
     }
 
@@ -71,7 +71,7 @@ public abstract class Entity {
 
     @Override
     public String toString() {
-        return String.format("%s@%d[%.2f kg] in %s", getClass().getSimpleName(), hashId, weight, point);
+        return String.format("%s@%d[%.2f kg] in %s", getClass().getSimpleName(), hashCode % 100, weight, point);
     }
 
     public double getWeight() {

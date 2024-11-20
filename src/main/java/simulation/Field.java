@@ -1,15 +1,15 @@
 package simulation;
 
+import lombok.extern.slf4j.Slf4j;
 import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+@Slf4j
 public class Field {
     public class EntityGroup {
         private final Set<Entity> entities;
@@ -76,14 +76,21 @@ public class Field {
     }
 
     public void addEntity(int x, int y, Entity entity) {
+        requireNonNull(entity);
         checkPos(x, y);
-        checkMaxQuantity(entity, x, y);
+        try {
+            checkMaxQuantity(entity, x, y);
+        } catch (TooMuchEntitiesException e) {
+            throw e;
+        }
+
         increaseCounters(entity);
         field[y][x].addEntity(entity);
         entityPointMap.put(entity, new Point(x, y));
     }
 
     public void removeEntity(Entity entity) {
+        requireNonNull(entity);
         Point point = entityPointMap.get(entity);
         decreaseCounters(entity);
         field[point.y()][point.x()].removeEntity(entity);
@@ -91,6 +98,7 @@ public class Field {
     }
 
     private void increaseCounters(Entity entity) {
+        requireNonNull(entity);
         if (!entityPointMap.containsKey(entity)) {
             if (entity.isPlant()) {
                 plantCnt++;
@@ -101,6 +109,7 @@ public class Field {
     }
 
     public void decreaseCounters(Entity entity) {
+        requireNonNull(entity);
         if (entityPointMap.containsKey(entity)) {
             if (entity.isPlant()) {
                 plantCnt--;
@@ -110,9 +119,15 @@ public class Field {
         }
     }
 
-    public void moveEntity(int x, int y, Entity entity) {
+    public void moveEntity(Point from, Point to,  Entity entity) {
+        requireNonNull(entity);
         removeEntity(entity);
-        addEntity(x, y, entity);
+        try {
+            addEntity(to.x(), to.y(), entity);
+        } catch (TooMuchEntitiesException e) {
+            addEntity(from.x(), from.y(), entity);
+            log.debug("{} wasn't added because it is already too much of it", entity);
+        }
     }
 
     public EntityGroup getEntityGroup(int x, int y) {
@@ -126,6 +141,7 @@ public class Field {
     }
 
     public Point getEntityPoint(Entity entity) {
+        requireNonNull(entity);
         return entityPointMap.get(entity);
     }
 
@@ -141,8 +157,19 @@ public class Field {
     }
 
     private void checkMaxQuantity(Entity entity, int x, int y) {
+        requireNonNull(entity);
         if (field[y][x].entityCnt(entity.getClass()) == entity.maxQuantity()) {
-            throw new TooMuchEntitiesException(entity.getClass());
+            throw new TooMuchEntitiesException(entity);
+        }
+    }
+
+    public Set<Entity> getEntities() {
+        return Set.copyOf(entityPointMap.keySet());
+    }
+
+    public static void requireNonNull(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Can't be null");
         }
     }
 
@@ -151,6 +178,7 @@ public class Field {
         StringBuilder sb = new StringBuilder();
         sb.append("\n<----------------------->").append("\n");
         sb.append("\t  I   N   F   O").append("\n\n");
+        sb.append(entityCnt()).append(" entities, including:").append("\n");
         sb.append(animalCnt).append(" animals").append("\n");
         sb.append(plantCnt).append(" plants").append("\n");
         sb.append("\n");
@@ -159,6 +187,17 @@ public class Field {
             sb.append(entry.getKey()).append("\n");
         }
         sb.append("\n<----------------------->").append("\n");
+        return sb.toString();
+    }
+
+    public String shortToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n<----------------------->").append("\n");
+        sb.append("Field").append("\n");
+        sb.append(entityCnt()).append(" entities, including:").append("\n");
+        sb.append(animalCnt).append(" animals").append("\n");
+        sb.append(plantCnt).append(" plants").append("\n");
+        sb.append("<----------------------->").append("\n");
         return sb.toString();
     }
 
