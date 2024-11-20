@@ -1,13 +1,13 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Plant;
-import simulation.animal.herbivore.Deer;
+import simulation.entity.Point;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.herbivore.Deer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static simulation.animal.Animal.Direction.UP;
+import static simulation.entity.animal.Animal.Direction.UP;
 
 public class FieldTest {
     private Field field;

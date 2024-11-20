@@ -1,15 +1,15 @@
 package simulation.util;
 
-import simulation.Entity;
+import simulation.entity.Entity;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Animal;
+import simulation.entity.Point;
+import simulation.entity.animal.Animal;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static simulation.animal.Animal.Direction.*;
+import static simulation.entity.animal.Animal.Direction.*;
 
 public final class PointUtil {
     private static final Random rnd = new Random();

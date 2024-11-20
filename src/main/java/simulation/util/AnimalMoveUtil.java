@@ -1,9 +1,9 @@
 package simulation.util;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
-import static simulation.animal.Animal.Direction;
+import static simulation.entity.animal.Animal.Direction;
 
 public final class AnimalMoveUtil {
     private AnimalMoveUtil() {

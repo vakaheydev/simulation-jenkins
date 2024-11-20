@@ -1,7 +1,7 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
 public class Caterpillar extends Herbivore {
     public Caterpillar() {

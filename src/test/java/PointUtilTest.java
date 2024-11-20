@@ -1,8 +1,8 @@
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import simulation.Point;
-import simulation.animal.Plant;
-import simulation.animal.herbivore.Caterpillar;
+import simulation.entity.Point;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.herbivore.Caterpillar;
 import simulation.util.PointUtil;
 import simulation.Field;
 

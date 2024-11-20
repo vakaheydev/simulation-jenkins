@@ -3,14 +3,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Animal;
-import simulation.animal.Animal.Direction;
-import simulation.animal.predator.Eagle;
-import simulation.animal.predator.Wolf;
+import simulation.entity.Point;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.Animal.Direction;
+import simulation.entity.animal.predator.Eagle;
+import simulation.entity.animal.predator.Wolf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static simulation.animal.Animal.Direction.*;
+import static simulation.entity.animal.Animal.Direction.*;
 
 @Slf4j
 public class AnimalTest {

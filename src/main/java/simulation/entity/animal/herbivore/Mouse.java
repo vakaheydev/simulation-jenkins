@@ -1,38 +1,38 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
-public class Rabbit extends Herbivore {
-    public Rabbit() {
+public class Mouse extends Herbivore {
+    public Mouse() {
     }
 
-    public Rabbit(Field field, int x, int y) {
+    public Mouse(Field field, int x, int y) {
         super(field, x, y);
     }
 
     @Override
     public double initialWeight() {
-        return 2;
+        return 0.05;
     }
 
     @Override
     public int maxQuantity() {
-        return 150;
+        return 500;
     }
 
     @Override
     public int speed() {
-        return 2;
+        return 1;
     }
 
     @Override
     public double neededFoodWeight() {
-        return 0.45;
+        return 0.01;
     }
 
     @Override
     public Animal createNewInstance(Field field, int x, int y) {
-        return new Rabbit(field, x, y);
+        return new Mouse(field, x, y);
     }
 }

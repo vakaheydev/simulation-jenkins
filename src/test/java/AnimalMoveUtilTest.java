@@ -2,14 +2,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Animal;
-import simulation.animal.herbivore.Caterpillar;
-import simulation.animal.herbivore.Herbivore;
+import simulation.entity.Point;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.herbivore.Caterpillar;
+import simulation.entity.animal.herbivore.Herbivore;
 import simulation.util.AnimalMoveUtil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static simulation.animal.Animal.Direction.*;
+import static simulation.entity.animal.Animal.Direction.*;
 
 @Slf4j
 public class AnimalMoveUtilTest {

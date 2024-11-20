@@ -1,5 +1,7 @@
 package simulation;
 
+import simulation.entity.Entity;
+import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
 import java.util.HashMap;

@@ -1,7 +1,8 @@
-package simulation;
+package simulation.entity;
 
 import lombok.extern.slf4j.Slf4j;
-import simulation.animal.EntityType;
+import simulation.Field;
+import simulation.entity.animal.EntityType;
 
 import java.util.Objects;
 

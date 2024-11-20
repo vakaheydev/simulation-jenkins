@@ -1,8 +1,8 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
-import simulation.animal.Plant;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.Plant;
 
 public abstract class Herbivore extends Animal {
     public Herbivore() {

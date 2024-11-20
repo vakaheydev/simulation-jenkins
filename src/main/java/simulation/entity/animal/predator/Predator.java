@@ -1,7 +1,7 @@
-package simulation.animal.predator;
+package simulation.entity.animal.predator;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
 public abstract class Predator extends Animal {
     public Predator() {

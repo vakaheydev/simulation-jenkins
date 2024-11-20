@@ -1,19 +1,19 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
-public class Sheep extends Herbivore {
-    public Sheep() {
+public class Goat extends Herbivore {
+    public Goat() {
     }
 
-    public Sheep(Field field, int x, int y) {
+    public Goat(Field field, int x, int y) {
         super(field, x, y);
     }
 
     @Override
     public double initialWeight() {
-        return 70;
+        return 60;
     }
 
     @Override
@@ -28,11 +28,11 @@ public class Sheep extends Herbivore {
 
     @Override
     public double neededFoodWeight() {
-        return 15;
+        return 10;
     }
 
     @Override
     public Animal createNewInstance(Field field, int x, int y) {
-        return new Sheep(field, x, y);
+        return new Goat(field, x, y);
     }
 }

@@ -1,13 +1,13 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import simulation.Entity;
+import simulation.entity.Entity;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.herbivore.Buffalo;
-import simulation.animal.herbivore.Caterpillar;
-import simulation.animal.herbivore.Duck;
-import simulation.animal.herbivore.Mouse;
+import simulation.entity.Point;
+import simulation.entity.animal.herbivore.Buffalo;
+import simulation.entity.animal.herbivore.Caterpillar;
+import simulation.entity.animal.herbivore.Duck;
+import simulation.entity.animal.herbivore.Mouse;
 import simulation.util.EntityUtil;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static simulation.animal.Animal.Direction.*;
+import static simulation.entity.animal.Animal.Direction.*;
 
 public class EntityTest {
     private Field field;

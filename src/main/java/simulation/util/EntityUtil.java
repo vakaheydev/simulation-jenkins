@@ -1,11 +1,11 @@
 package simulation.util;
 
-import simulation.Entity;
+import simulation.entity.Entity;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Plant;
-import simulation.animal.herbivore.*;
-import simulation.animal.predator.*;
+import simulation.entity.Point;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.herbivore.*;
+import simulation.entity.animal.predator.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

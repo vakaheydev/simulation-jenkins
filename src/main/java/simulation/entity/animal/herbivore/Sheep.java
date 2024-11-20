@@ -1,24 +1,24 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
-public class Buffalo extends Herbivore {
-    public Buffalo() {
+public class Sheep extends Herbivore {
+    public Sheep() {
     }
 
-    public Buffalo(Field field, int x, int y) {
+    public Sheep(Field field, int x, int y) {
         super(field, x, y);
     }
 
     @Override
     public double initialWeight() {
-        return 700;
+        return 70;
     }
 
     @Override
     public int maxQuantity() {
-        return 10;
+        return 140;
     }
 
     @Override
@@ -28,11 +28,11 @@ public class Buffalo extends Herbivore {
 
     @Override
     public double neededFoodWeight() {
-        return 100;
+        return 15;
     }
 
     @Override
     public Animal createNewInstance(Field field, int x, int y) {
-        return new Buffalo(field, x, y);
+        return new Sheep(field, x, y);
     }
 }

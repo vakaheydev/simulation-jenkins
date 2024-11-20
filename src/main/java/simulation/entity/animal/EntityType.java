@@ -1,4 +1,4 @@
-package simulation.animal;
+package simulation.entity.animal;
 
 public enum EntityType {
     ANIMAL, PLANT

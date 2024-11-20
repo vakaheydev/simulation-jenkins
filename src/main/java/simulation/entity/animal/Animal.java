@@ -1,9 +1,9 @@
-package simulation.animal;
+package simulation.entity.animal;
 
 import lombok.extern.slf4j.Slf4j;
-import simulation.Entity;
+import simulation.entity.Entity;
 import simulation.Field;
-import simulation.Point;
+import simulation.entity.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;

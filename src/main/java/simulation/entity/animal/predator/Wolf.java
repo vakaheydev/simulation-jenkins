@@ -1,8 +1,8 @@
-package simulation.animal.predator;
+package simulation.entity.animal.predator;
 
 import simulation.Field;
-import simulation.animal.Animal;
-import simulation.animal.herbivore.*;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.herbivore.*;
 
 public class Wolf extends Predator {
     public Wolf() {

@@ -1,10 +1,10 @@
-package simulation.animal.predator;
+package simulation.entity.animal.predator;
 
 import simulation.Field;
-import simulation.animal.Animal;
-import simulation.animal.herbivore.Duck;
-import simulation.animal.herbivore.Mouse;
-import simulation.animal.herbivore.Rabbit;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.herbivore.Duck;
+import simulation.entity.animal.herbivore.Mouse;
+import simulation.entity.animal.herbivore.Rabbit;
 
 public class Boa extends Predator {
     public Boa() {

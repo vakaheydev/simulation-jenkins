@@ -1,6 +1,6 @@
 package simulation.exception;
 
-import simulation.Entity;
+import simulation.entity.Entity;
 
 public class TooMuchEntitiesException extends RuntimeException {
     public TooMuchEntitiesException(Class<? extends Entity> entityClass) {

@@ -1,30 +1,24 @@
-package simulation.animal.herbivore;
+package simulation.entity.animal.herbivore;
 
 import simulation.Field;
-import simulation.animal.Animal;
+import simulation.entity.animal.Animal;
 
-public class Duck extends Herbivore {
-    public Duck() {
+public class Deer extends Herbivore {
+    public Deer() {
     }
 
-    public Duck(Field field, int x, int y) {
+    public Deer(Field field, int x, int y) {
         super(field, x, y);
     }
 
     @Override
-    protected void populateChancesMap() {
-        super.populateChancesMap();
-        addChance(Caterpillar.class, 1.0);
-    }
-
-    @Override
     public double initialWeight() {
-        return 1;
+        return 300;
     }
 
     @Override
     public int maxQuantity() {
-        return 200;
+        return 20;
     }
 
     @Override
@@ -34,7 +28,7 @@ public class Duck extends Herbivore {
 
     @Override
     public double neededFoodWeight() {
-        return 0.15;
+        return 50;
     }
 
     @Override

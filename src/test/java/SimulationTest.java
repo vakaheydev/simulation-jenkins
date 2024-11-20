@@ -1,19 +1,18 @@
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
-import simulation.Point;
-import simulation.animal.Plant;
-import simulation.animal.herbivore.*;
-import simulation.animal.predator.Bear;
-import simulation.animal.predator.Boa;
-import simulation.animal.predator.Fox;
+import simulation.entity.Point;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.herbivore.*;
+import simulation.entity.animal.predator.Bear;
+import simulation.entity.animal.predator.Boa;
+import simulation.entity.animal.predator.Fox;
 import simulation.util.EntityUtil;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static simulation.animal.Animal.Direction.*;
+import static simulation.entity.animal.Animal.Direction.*;
 
 @Slf4j
 public class SimulationTest {

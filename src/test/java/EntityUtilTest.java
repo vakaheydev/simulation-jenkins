@@ -1,13 +1,13 @@
 import lombok.extern.slf4j.Slf4j;
-import simulation.Point;
-import simulation.animal.Plant;
-import simulation.animal.predator.Bear;
+import simulation.entity.Point;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.predator.Bear;
 import simulation.util.EntityUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
-import simulation.animal.predator.Wolf;
+import simulation.entity.animal.predator.Wolf;
 
 @Slf4j
 public class EntityUtilTest {

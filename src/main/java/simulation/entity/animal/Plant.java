@@ -1,6 +1,6 @@
-package simulation.animal;
+package simulation.entity.animal;
 
-import simulation.Entity;
+import simulation.entity.Entity;
 import simulation.Field;
 
 public class Plant extends Entity {

@@ -1,8 +1,8 @@
 package simulation;
 
-import simulation.animal.Animal;
-import simulation.animal.herbivore.Caterpillar;
-import simulation.animal.herbivore.Duck;
+import simulation.entity.animal.Animal;
+import simulation.entity.animal.herbivore.Caterpillar;
+import simulation.entity.animal.herbivore.Duck;
 
 public class Main {
     public static void main(String[] args) {
