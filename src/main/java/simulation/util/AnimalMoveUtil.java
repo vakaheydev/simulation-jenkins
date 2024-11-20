@@ -1,5 +1,6 @@
 package simulation.util;
 
+import simulation.Field;
 import simulation.animal.Animal;
 
 import static simulation.animal.Animal.Direction;
@@ -8,16 +9,16 @@ public final class AnimalMoveUtil {
     private AnimalMoveUtil() {
     }
 
-    public static void randomMove(Animal animal, int moveCnt) {
+    public static void randomMove(Field field, Animal animal, int moveCnt) {
         checkSpeed(animal, moveCnt);
 
         for (int i = 0; i < moveCnt; i++) {
-            randomMove(animal);
+            randomMove(field, animal);
         }
     }
 
-    public static void randomMove(Animal animal) {
-        Direction rndDirection = PointUtil.getRandomDirection(animal.getPoint());
+    public static void randomMove(Field field, Animal animal) {
+        Direction rndDirection = PointUtil.getRandomDirection(field, animal.getPoint());
         animal.move(rndDirection);
     }
 

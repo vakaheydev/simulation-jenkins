@@ -1,3 +1,4 @@
+import lombok.extern.slf4j.Slf4j;
 import simulation.Point;
 import simulation.animal.Plant;
 import simulation.animal.predator.Bear;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import simulation.Field;
 import simulation.animal.predator.Wolf;
 
+@Slf4j
 public class EntityUtilTest {
     Field field;
 
@@ -46,7 +48,8 @@ public class EntityUtilTest {
 
         Assertions.assertEquals(5, field.entityCnt());
         Assertions.assertEquals(5, field.animalCnt());
-        System.out.println(field);
+
+        log.info(field.toString());
     }
 
     @Test
@@ -57,6 +60,6 @@ public class EntityUtilTest {
         Assertions.assertEquals(field.entityCnt() - field.plantCnt(), field.animalCnt());
         Assertions.assertEquals(field.entityCnt() - field.animalCnt(), field.plantCnt());
 
-        System.out.println(field);
+        log.info(field.toString());
     }
 }

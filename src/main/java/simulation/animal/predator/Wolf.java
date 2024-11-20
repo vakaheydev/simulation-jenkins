@@ -1,10 +1,13 @@
 package simulation.animal.predator;
 
-import simulation.animal.Animal;
 import simulation.Field;
+import simulation.animal.Animal;
 import simulation.animal.herbivore.*;
 
 public class Wolf extends Predator {
+    public Wolf() {
+    }
+
     public Wolf(Field field, int x, int y) {
         super(field, x, y);
     }

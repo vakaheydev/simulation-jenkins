@@ -1,13 +1,16 @@
 package simulation.animal.predator;
 
+import simulation.Field;
 import simulation.animal.Animal;
 import simulation.animal.herbivore.Caterpillar;
 import simulation.animal.herbivore.Duck;
-import simulation.Field;
 import simulation.animal.herbivore.Mouse;
 import simulation.animal.herbivore.Rabbit;
 
 public class Fox extends Predator {
+    public Fox() {
+    }
+
     public Fox(Field field, int x, int y) {
         super(field, x, y);
     }

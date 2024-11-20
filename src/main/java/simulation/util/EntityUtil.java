@@ -1,12 +1,13 @@
 package simulation.util;
 
-import simulation.Point;
-import simulation.animal.Plant;
 import simulation.Entity;
 import simulation.Field;
+import simulation.Point;
+import simulation.animal.Plant;
 import simulation.animal.herbivore.*;
 import simulation.animal.predator.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Random;
 
@@ -39,7 +40,7 @@ public final class EntityUtil {
     public static void addEntities(Field field, Class<? extends Entity> clazz, int amount) {
         for (int i = 0; i < amount; i++) {
             Point point = PointUtil.getRandomPoint(field, clazz);
-            newInstance(field, clazz);
+            newInstance(field, point, clazz);
         }
     }
 
@@ -47,7 +48,7 @@ public final class EntityUtil {
         for (int i = 0; i < amount; i++) {
             Class<? extends Entity> clazz = getRandomClass();
             Point point = PointUtil.getRandomPoint(field, clazz);
-            newInstance(field, clazz);
+            newInstance(field, point, clazz);
         }
     }
 
@@ -76,29 +77,29 @@ public final class EntityUtil {
 
     public static int getMaxQuantity(Field field, Class<? extends Entity> clazz) {
         try {
-            Entity entity = clazz.getConstructor(Field.class, int.class, int.class).newInstance(field, 0, 0);
-            int maxAmount = (int) clazz.getMethod("maxQuantity").invoke(entity);
-
-            field.removeEntity(entity);
-            return maxAmount;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            Entity entity = clazz.getDeclaredConstructor().newInstance();
+            return (int) clazz.getMethod("maxQuantity").invoke(entity);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
         }
     }
 
     public static <T> T newInstance(Field field, Point point, Class<? extends Entity> clazz) {
         try {
             return (T) clazz.getConstructor(Field.class, int.class, int.class).newInstance(field, point.x(), point.y());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
         }
     }
 
     public static <T> T newInstance(Field field, Class<? extends Entity> clazz) {
         try {
-            return (T) clazz.getConstructor(Field.class, int.class, int.class).newInstance(field, 0, 0);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return (T) clazz.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
         }
     }
 }

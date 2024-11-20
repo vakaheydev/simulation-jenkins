@@ -1,9 +1,14 @@
 package simulation.animal.herbivore;
 
-import simulation.animal.Animal;
 import simulation.Field;
+import simulation.animal.Animal;
 
 public class Boar extends Herbivore {
+
+    public Boar() {
+        super();
+    }
+
     public Boar(Field field, int x, int y) {
         super(field, x, y);
     }

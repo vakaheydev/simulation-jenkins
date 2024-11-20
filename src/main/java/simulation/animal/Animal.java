@@ -1,18 +1,21 @@
 package simulation.animal;
 
-import simulation.Point;
+import lombok.extern.slf4j.Slf4j;
 import simulation.Entity;
 import simulation.Field;
+import simulation.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static simulation.Field.EntityGroup;
-
+@Slf4j
 public abstract class Animal extends Entity {
-    protected static final Map<Class<? extends Entity>, Double> chances = new HashMap<>();
+    public Animal() {
+    }
+
+    protected final Map<Class<? extends Entity>, Double> chances = new HashMap<>();
 
     public enum Direction {
         RIGHT, LEFT, UP, DOWN
@@ -31,7 +34,7 @@ public abstract class Animal extends Entity {
         if (canEat(entity)) {
             double chance = getChanceToEat(entity);
             if (randomEat(chance)) {
-                System.out.println(this + " eats " + entity);
+                log.debug("{} eats {}", this, entity);
                 entity.die();
                 weight += entity.getWeight();
                 return entity.getWeight();
@@ -69,7 +72,7 @@ public abstract class Animal extends Entity {
         if (this.getClass().equals(entity.getClass())) {
             Animal other = (Animal) entity;
             if (this.point.equals(other.point)) {
-                System.out.println(this + " multiply with " + entity);
+                log.debug("{} multiply with {}", this, entity);
                 field.addEntity(point.x(), point.y(), createNewInstance(this.field, point.x(), point.y()));
             }
         }
@@ -97,9 +100,9 @@ public abstract class Animal extends Entity {
         int x = directionPoint.x();
         int y = directionPoint.y();
 
-        EntityGroup entityGroup = field.getEntityGroup(x, y);
+        Field.EntityGroup entityGroup = field.getEntityGroup(x, y);
 
-        System.out.printf("%s moving %s to %s\n", this, direction, directionPoint);
+        log.debug("{} moving {} to {}", this, direction, directionPoint);
 
         this.point = new Point(x, y);
         actOnEntityGroup(entityGroup);
@@ -120,7 +123,7 @@ public abstract class Animal extends Entity {
         return weight;
     }
 
-    private double actOnEntityGroup(EntityGroup entityGroup) {
+    private double actOnEntityGroup(Field.EntityGroup entityGroup) {
         double eatenWeight = 0;
         for (var other : new ArrayList<>(entityGroup.getEntities())) {
             this.multiply(other);
@@ -141,8 +144,6 @@ public abstract class Animal extends Entity {
         }
 
         if (weight <= 0) {
-            System.out.printf("Whoops... poor %s dies from hunger\n",
-                    getClass().getSimpleName());
             die();
             return true;
         }

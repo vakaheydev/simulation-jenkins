@@ -1,16 +1,21 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import simulation.Entity;
+import simulation.Field;
 import simulation.Point;
+import simulation.animal.herbivore.Buffalo;
 import simulation.animal.herbivore.Caterpillar;
 import simulation.animal.herbivore.Duck;
-import simulation.util.EntityUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import simulation.Field;
 import simulation.animal.herbivore.Mouse;
+import simulation.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static simulation.animal.Animal.Direction.*;
 
 public class EntityTest {
     private Field field;
@@ -20,6 +25,7 @@ public class EntityTest {
         field = new Field();
     }
 
+    @DisplayName("Different hash codes")
     @Test
     public void testEntityShouldHaveDifferentHashCode() {
         EntityUtil.addEntities(field, new Point(0, 0), Duck.class, 199);
@@ -36,12 +42,37 @@ public class EntityTest {
 
         Entity entity = EntityUtil.newInstance(field, clazz);
 
-        int hashCode = entity.hashCode();
 
-        for (Entity x : entities) {
-            int otherHashCode = x.hashCode();
-            System.out.println(otherHashCode);
-            Assertions.assertNotEquals(hashCode, otherHashCode);
+        for (int i = 0; i < entities.size(); i++) {
+            int hashCode = entities.get(i).hashCode();
+
+            for (int j = 0; j < entities.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                int otherHashCode = entities.get(j).hashCode();
+                assertNotEquals(hashCode, otherHashCode);
+            }
         }
+    }
+
+    @DisplayName("Equals hash codes")
+    @Test
+    public void shouldHaveSameHashCode() {
+        Buffalo buffalo = new Buffalo(field, 5, 5);
+        int hashCode = buffalo.hashCode();
+
+        buffalo.move(UP);
+        assertEquals(hashCode, buffalo.hashCode());
+
+        buffalo.move(RIGHT);
+        assertEquals(hashCode, buffalo.hashCode());
+
+        buffalo.move(UP, DOWN);
+        assertEquals(hashCode, buffalo.hashCode());
+
+        buffalo.move(LEFT);
+        assertEquals(hashCode, buffalo.hashCode());
     }
 }

@@ -1,12 +1,15 @@
 package simulation.animal.predator;
 
+import simulation.Field;
 import simulation.animal.Animal;
 import simulation.animal.herbivore.Duck;
-import simulation.Field;
 import simulation.animal.herbivore.Mouse;
 import simulation.animal.herbivore.Rabbit;
 
 public class Boa extends Predator {
+    public Boa() {
+    }
+
     public Boa(Field field, int x, int y) {
         super(field, x, y);
     }

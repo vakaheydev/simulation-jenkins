@@ -4,6 +4,9 @@ import simulation.Entity;
 import simulation.Field;
 
 public class Plant extends Entity {
+    public Plant() {
+    }
+
     public Plant(Field field, int x, int y) {
         super(field, x, y);
     }

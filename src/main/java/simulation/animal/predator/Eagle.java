@@ -1,12 +1,15 @@
 package simulation.animal.predator;
 
+import simulation.Field;
 import simulation.animal.Animal;
 import simulation.animal.herbivore.Duck;
-import simulation.Field;
 import simulation.animal.herbivore.Mouse;
 import simulation.animal.herbivore.Rabbit;
 
 public class Eagle extends Predator {
+    public Eagle() {
+    }
+
     public Eagle(Field field, int x, int y) {
         super(field, x, y);
     }

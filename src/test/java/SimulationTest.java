@@ -1,25 +1,42 @@
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import simulation.Field;
 import simulation.Point;
-import simulation.animal.Animal;
 import simulation.animal.Plant;
+import simulation.animal.herbivore.*;
 import simulation.animal.predator.Bear;
 import simulation.animal.predator.Boa;
 import simulation.animal.predator.Fox;
 import simulation.util.EntityUtil;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import simulation.Field;
-import simulation.animal.herbivore.*;
-import simulation.animal.predator.Wolf;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static simulation.animal.Animal.Direction.*;
 
+@Slf4j
 public class SimulationTest {
-    private Field field;
+    private Field field = new Field();
 
     @BeforeEach
     public void setup() {
-        field = new Field();
+        field.clear();
+    }
+
+    @Test
+//    @Disabled
+    @DisplayName("Loop tests")
+    public void testDuckAndCaterpillarInLoop() {
+        for (int i = 0; i < 10000; i++) {
+            testDuckAndCaterpillarShouldActCorrectly();
+            field = new Field();
+        }
+
+        for (int i = 0; i < 10000; i++) {
+            testAnimalShouldMove();
+            field = new Field();
+        }
     }
 
 
@@ -32,13 +49,18 @@ public class SimulationTest {
         Caterpillar caterpillar2 = new Caterpillar(field, 5, 4);
         Caterpillar caterpillar3 = new Caterpillar(field, 5, 3);
 
-        System.out.println(field);
-        duck2.move(Animal.Direction.LEFT, Animal.Direction.RIGHT, Animal.Direction.DOWN, Animal.Direction.RIGHT);
-        duck2.move(Animal.Direction.RIGHT, Animal.Direction.RIGHT, Animal.Direction.RIGHT);
-        duck2.move(Animal.Direction.RIGHT, Animal.Direction.RIGHT, Animal.Direction.RIGHT, Animal.Direction.UP);
+        log.info("duck1: {}", duck.hashCode());
+        log.info("duck2: {}", duck2.hashCode());
 
-        System.out.println("--- End of simulation ---");
-        System.out.println(field);
+        assertNotEquals(duck.hashCode(), duck2.hashCode());
+
+        log.info(field.toString());
+        duck2.move(LEFT, RIGHT, DOWN, RIGHT);
+        duck2.move(RIGHT, RIGHT, RIGHT);
+        duck2.move(RIGHT, RIGHT, RIGHT, UP);
+
+        log.info("--- End of simulation ---");
+        log.info(field.toString());
 
         assertEquals(3, field.entityCnt());
         assertEquals(3, field.animalCnt());
@@ -58,22 +80,25 @@ public class SimulationTest {
         assertTrue(duck.isAlive());
     }
 
-    @DisplayName("Animals should multiply")
+    @DisplayName("Herbivore should eat all plants in location")
     @Test
-    public void testAnimalsShouldMultiply() {
-        Wolf wolf = new Wolf(field, 0, 0);
-        Wolf wolf3 = new Wolf(field, 0, 0);
-        Wolf wolf2 = new Wolf(field, 1, 0);
+    public void testHerbivoreShouldEatAllPlants() {
+        EntityUtil.addEntities(field, new Point(0, 0), Plant.class, 200);
+        Buffalo buffalo = new Buffalo(field, 1, 0);
 
-        assertEquals(3, field.entityCnt());
-        assertEquals(3, field.animalCnt());
+        assertEquals(201, field.entityCnt());
+        assertEquals(1, field.animalCnt());
+        assertEquals(200, field.plantCnt());
+
+        buffalo.move(LEFT);
+
+        assertEquals(1, field.entityCnt());
+        assertEquals(1, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        wolf2.move(Animal.Direction.LEFT);
+        assertEquals(830.0, buffalo.getWeight());
 
-        assertEquals(5, field.entityCnt());
-        assertEquals(5, field.animalCnt());
-        assertEquals(0, field.plantCnt());
+        log.info(field.toString());
     }
 
     @DisplayName("Predator should eat herbivore")
@@ -95,13 +120,13 @@ public class SimulationTest {
         assertEquals(11, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        bear.move(Animal.Direction.DOWN);
+        bear.move(DOWN);
 
         assertTrue(field.animalCnt() < 11);
         assertTrue(field.entityCnt() < 11);
         assertEquals(0, field.plantCnt());
 
-        System.out.println(field);
+        log.info(field.toString());
     }
 
     @DisplayName("Herbivore should eat plant")
@@ -114,7 +139,7 @@ public class SimulationTest {
         assertEquals(1, field.animalCnt());
         assertEquals(1, field.plantCnt());
 
-        deer.move(Animal.Direction.LEFT);
+        deer.move(LEFT);
 
         double initWeight = deer.initialWeight();
 
@@ -124,7 +149,7 @@ public class SimulationTest {
         assertEquals(1, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        System.out.println(field);
+        log.info(field.toString());
     }
 
     @DisplayName("Animal shouldn't move further than it can")
@@ -137,7 +162,7 @@ public class SimulationTest {
         assertEquals(0, field.plantCnt());
 
         assertThrows(IllegalArgumentException.class, () -> fox.move(
-                Animal.Direction.UP, Animal.Direction.UP, Animal.Direction.RIGHT));
+                UP, UP, RIGHT));
     }
 
     @DisplayName("Animal should die from hunger")
@@ -149,27 +174,27 @@ public class SimulationTest {
         assertEquals(1, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        goat.move(Animal.Direction.LEFT);
+        goat.move(LEFT);
 
         assertEquals(new Point(4, 0), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.DOWN);
+        goat.move(DOWN);
 
         assertEquals(new Point(4, 1), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.UP);
+        goat.move(UP);
 
         assertEquals(new Point(4, 0), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.RIGHT, Animal.Direction.DOWN, Animal.Direction.DOWN);
+        goat.move(RIGHT, DOWN, DOWN);
 
         assertEquals(new Point(5, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.UP, Animal.Direction.DOWN);
+        goat.move(UP, DOWN);
 
         assertEquals(new Point(5, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.DOWN, Animal.Direction.UP);
+        goat.move(DOWN, UP);
 
         assertEquals(0, field.entityCnt());
         assertEquals(0, field.animalCnt());
@@ -187,46 +212,46 @@ public class SimulationTest {
         assertEquals(2, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        goat.move(Animal.Direction.LEFT);
+        goat.move(LEFT);
 
         assertEquals(new Point(4, 0), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.DOWN);
+        goat.move(DOWN);
 
         assertEquals(new Point(4, 1), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.UP);
+        goat.move(UP);
 
         assertEquals(new Point(4, 0), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.RIGHT, Animal.Direction.DOWN, Animal.Direction.DOWN);
+        goat.move(RIGHT, DOWN, DOWN);
 
         assertEquals(new Point(5, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.UP, Animal.Direction.DOWN);
+        goat.move(UP, DOWN);
 
         assertEquals(new Point(5, 2), field.getEntityPoint(goat));
 
         EntityUtil.addEntities(field, new Point(5, 2), Plant.class, 100);
 
-        goat.move(Animal.Direction.DOWN, Animal.Direction.UP);
+        goat.move(DOWN, UP);
 
         assertEquals(new Point(5, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.LEFT, Animal.Direction.LEFT, Animal.Direction.LEFT);
+        goat.move(LEFT, LEFT, LEFT);
 
         assertEquals(new Point(2, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.LEFT, Animal.Direction.RIGHT);
+        goat.move(LEFT, RIGHT);
 
         assertEquals(new Point(2, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.RIGHT, Animal.Direction.LEFT);
+        goat.move(RIGHT, LEFT);
 
         assertEquals(new Point(2, 2), field.getEntityPoint(goat));
 
-        goat.move(Animal.Direction.LEFT, Animal.Direction.LEFT);
-        goat.move(Animal.Direction.UP, Animal.Direction.UP);
+        goat.move(LEFT, LEFT);
+        goat.move(UP, UP);
 
         assertEquals(new Point(0, 0), field.getEntityPoint(goat));
 

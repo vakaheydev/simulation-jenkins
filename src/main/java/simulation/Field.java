@@ -9,9 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class Field {
-    public static class EntityGroup {
-        private Set<Entity> entities;
-        private Map<Class<? extends Entity>, Integer> entititesCntMap;
+    public class EntityGroup {
+        private final Set<Entity> entities;
+        private final Map<Class<? extends Entity>, Integer> entititesCntMap;
 
         public EntityGroup() {
             entities = ConcurrentHashMap.newKeySet();
@@ -25,7 +25,7 @@ public class Field {
 
         public void removeEntity(Entity entity) {
             entities.remove(entity);
-            entititesCntMap.merge(entity.getClass(), 1, (oldValue, subtrahend) -> oldValue - subtrahend );
+            entititesCntMap.merge(entity.getClass(), 1, (oldValue, subtrahend) -> oldValue - subtrahend);
         }
 
         public final Set<Entity> getEntities() {
@@ -55,17 +55,16 @@ public class Field {
         }
     }
 
-    private Map<Entity, Point> entityPointMap;
-
-    private static EntityGroup[][] field;
+    private final Map<Entity, Point> entityPointMap;
+    private final EntityGroup[][] field;
     private int animalCnt = 0;
     private int plantCnt = 0;
-    public static final int FIELD_HEIGHT = 100;
-    public static final int FIELD_WIDTH = 20;
+    public final int height = 100;
+    public final int width = 20;
 
     public Field() {
         entityPointMap = new HashMap<>();
-        field = new EntityGroup[FIELD_HEIGHT][FIELD_WIDTH];
+        field = new EntityGroup[height][width];
 
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[i].length; j++) {
@@ -129,19 +128,19 @@ public class Field {
     }
 
     private void checkPos(int x, int y) {
-        if (y < 0 || y > FIELD_HEIGHT - 1) {
+        if (y < 0 || y > height - 1) {
             throw new IllegalArgumentException(String.format("x (%d) must be in bounds: [%d - %d]", x, 0,
-                    FIELD_HEIGHT - 1));
+                    height - 1));
         }
-        if (x < 0 || x > FIELD_WIDTH - 1) {
+        if (x < 0 || x > width - 1) {
             throw new IllegalArgumentException(String.format("y (%d) must be in bounds: [%d - %d]", y, 0,
-                    FIELD_WIDTH - 1));
+                    width - 1));
         }
     }
 
     private void checkMaxQuantity(Entity entity, int x, int y) {
         if (field[y][x].entityCnt(entity.getClass()) == entity.maxQuantity()) {
-            throw new TooMuchEntitiesException(entity.maxQuantity(), entity.getClass());
+            throw new TooMuchEntitiesException(entity.getClass());
         }
     }
 
@@ -171,5 +170,17 @@ public class Field {
 
     public int plantCnt() {
         return plantCnt;
+    }
+
+    public void clear() {
+        entityPointMap.clear();
+        for (int i = 0; i < field.length; i++) {
+            for (int j = 0; j < field[i].length; j++) {
+                field[i][j].entities.clear();
+                field[i][j].entititesCntMap.clear();
+            }
+        }
+        animalCnt = 0;
+        plantCnt = 0;
     }
 }

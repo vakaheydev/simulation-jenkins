@@ -4,6 +4,9 @@ import simulation.Field;
 import simulation.animal.Animal;
 
 public class Duck extends Herbivore {
+    public Duck() {
+    }
+
     public Duck(Field field, int x, int y) {
         super(field, x, y);
     }
