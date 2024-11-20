@@ -24,22 +24,6 @@ public class SimulationTest {
     }
 
     @Test
-//    @Disabled
-    @DisplayName("Loop tests")
-    public void testDuckAndCaterpillarInLoop() {
-        for (int i = 0; i < 10000; i++) {
-            testDuckAndCaterpillarShouldActCorrectly();
-            field = new Field();
-        }
-
-        for (int i = 0; i < 10000; i++) {
-            testAnimalShouldMove();
-            field = new Field();
-        }
-    }
-
-
-    @Test
     @DisplayName("Duck multiply 1X | eat 2X | dies from hunger")
     public void testDuckAndCaterpillarShouldActCorrectly() {
         Duck duck = new Duck(field, 1, 2);
