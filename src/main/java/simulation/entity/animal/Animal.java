@@ -1,15 +1,13 @@
 package simulation.entity.animal;
 
 import lombok.extern.slf4j.Slf4j;
+import simulation.Field.EntityGroup;
 import simulation.entity.Entity;
 import simulation.Field;
 import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 public abstract class Animal extends Entity {
@@ -66,19 +64,26 @@ public abstract class Animal extends Entity {
     }
 
     public void multiply(Entity entity) {
+        if (this.point.equals(entity.getPoint())) {
+            multiplyClassEqualsEntity(entity);
+        }
+    }
+
+    public void multiplyWithoutPositionCheck(Entity entity) {
+        multiplyClassEqualsEntity(entity);
+    }
+
+    private void multiplyClassEqualsEntity(Entity entity) {
         if (checkDeathFromHunger()) {
             return;
         }
 
         if (this.getClass().equals(entity.getClass())) {
-            Animal other = (Animal) entity;
-            if (this.point.equals(other.point)) {
-                log.info("{} multiply with {}", this, entity);
-                try {
-                    field.addEntity(point.x(), point.y(), createNewInstance(this.field, point.x(), point.y()));
-                } catch (TooMuchEntitiesException e) {
-                    log.debug("{} wasn't added after multiplication because it is already too much of it", entity);
-                }
+            log.info("{} multiply with {}", this, entity);
+            try {
+                field.addEntity(point.x(), point.y(), createNewInstance(this.field, point.x(), point.y()));
+            } catch (TooMuchEntitiesException e) {
+                log.debug("{} wasn't added after multiplication because it is already too much of it", entity);
             }
         }
     }
@@ -105,32 +110,19 @@ public abstract class Animal extends Entity {
         int x = directionPoint.x();
         int y = directionPoint.y();
 
-        Field.EntityGroup entityGroup = field.getEntityGroup(x, y);
+        List<Entity> entities = field.getEntityGroup(x, y).getEntities();
 
         log.debug("{} moving {} to {}", this, direction, directionPoint);
+        field.moveEntity(point, new Point(x, y), this);
 
         this.point = new Point(x, y);
-        actOnEntityGroup(entityGroup);
+        actOnEntityList(entities);
         loseWeight();
-
-        if (!checkDeathFromHunger()) {
-            field.moveEntity(point, new Point(x, y), this);
-        }
     }
 
-    /**
-     * Lose 10% of current weight
-     *
-     * @return new weight
-     */
-    public double loseWeight() {
-        weight -= initialWeight() * 0.1;
-        return weight;
-    }
-
-    private double actOnEntityGroup(Field.EntityGroup entityGroup) {
+    private double actOnEntityList(List<Entity> entities) {
         double eatenWeight = 0;
-        for (var other : new ArrayList<>(entityGroup.getEntities())) {
+        for (var other : entities) {
             this.multiply(other);
             eatenWeight += this.eat(other);
             if (other instanceof Animal otherAnimal) {
@@ -141,6 +133,16 @@ public abstract class Animal extends Entity {
         }
 
         return eatenWeight;
+    }
+
+    /**
+     * Lose 10% of current weight
+     *
+     * @return new weight
+     */
+    protected double loseWeight() {
+        weight -= initialWeight() * 0.1;
+        return weight;
     }
 
     private boolean checkDeathFromHunger() {

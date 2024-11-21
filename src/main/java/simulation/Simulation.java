@@ -12,14 +12,14 @@ import java.util.Set;
 public class Simulation {
     public void start() {
         Field field = new Field();
-        EntityUtil.addEntities(field, 10000);
-        log.info(field.shortToString());
+        EntityUtil.addEntities(field, 100_000);
+        System.out.println(field);
         Set<Entity> entities = field.getEntities();
         for (Entity entity : entities) {
             if (entity instanceof Animal animal) {
                 AnimalMoveUtil.randomMove(field, animal);
             }
         }
-        log.info(field.shortToString());
+//        System.out.println(field.shortToString());
     }
 }

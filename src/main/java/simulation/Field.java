@@ -20,6 +20,11 @@ public class Field {
             entititesCntMap = new HashMap<>();
         }
 
+        public EntityGroup(EntityGroup group) {
+            entities = Set.copyOf(group.entities);
+            entititesCntMap = Map.copyOf(group.entititesCntMap);
+        }
+
         public void addEntity(Entity entity) {
             entities.add(entity);
             entititesCntMap.merge(entity.getClass(), 1, Integer::sum);
@@ -30,8 +35,8 @@ public class Field {
             entititesCntMap.merge(entity.getClass(), 1, (oldValue, subtrahend) -> oldValue - subtrahend);
         }
 
-        public final Set<Entity> getEntities() {
-            return entities;
+        public final List<Entity> getEntities() {
+            return List.copyOf(entities);
         }
 
         public int entityCnt(Class<? extends Entity> clazz) {
@@ -132,7 +137,12 @@ public class Field {
 
     public EntityGroup getEntityGroup(int x, int y) {
         checkPos(x, y);
-        return field[y][x];
+        return new EntityGroup(field[y][x]);
+    }
+
+    public Set<Entity> getEntities(int x, int y) {
+        checkPos(x, y);
+        return field[y][x].entities;
     }
 
     public EntityGroup getEntityGroup(Point point) {

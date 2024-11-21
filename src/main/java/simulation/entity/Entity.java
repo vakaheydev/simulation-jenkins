@@ -56,14 +56,18 @@ public abstract class Entity {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Entity entity = (Entity) object;
-        return Objects.equals(field, entity.field) && Objects.equals(point, entity.point) && Objects.equals(hashId, entity.hashId);
+        return
+                Objects.equals(field, entity.field) &&
+                Objects.equals(point, entity.point) &&
+                Objects.equals(weight, entity.weight) &&
+                Objects.equals(hashId, entity.hashId);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashId = 31 * 17 + field.getEntityGroup(point).entityCnt(getClass());
-            hashCode = Objects.hash(this.getClass().getSimpleName(), this.point, this.hashId);
+            hashId = 7919 * 101 + field.getEntityGroup(point).entityCnt(getClass());
+            hashCode = Objects.hash(this.getClass().getSimpleName(), this.point, this.hashId, this.weight);
         }
 
         return hashCode;
@@ -71,7 +75,8 @@ public abstract class Entity {
 
     @Override
     public String toString() {
-        return String.format("%s@%d[%.2f kg] in %s", getClass().getSimpleName(), hashCode % 100, weight, point);
+        String strHashCode = (hashCode != null) ? String.valueOf(hashCode % 100) : "undefined";
+        return String.format("%s@%s[%.2f kg] in %s", getClass().getSimpleName(), strHashCode, weight, point);
     }
 
     public double getWeight() {
