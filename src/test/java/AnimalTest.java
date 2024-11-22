@@ -129,8 +129,6 @@ public class AnimalTest {
         EntityTest.checkDifferentHashCodeOnEntityGroup(entityGroup);
 
         List<Entity> entities = entityGroup.getEntityGroupSet();
-
-        entities.forEach(System.out::println);
     }
 
     public void assertMoves(Animal animal, Direction... directions) {

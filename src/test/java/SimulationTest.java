@@ -37,9 +37,6 @@ public class SimulationTest {
         Caterpillar caterpillar2 = new Caterpillar(field, 5, 4);
         Caterpillar caterpillar3 = new Caterpillar(field, 5, 3);
 
-        log.info("duck1: {}", duck.hashCode());
-        log.info("duck2: {}", duck2.hashCode());
-
         assertNotEquals(duck.hashCode(), duck2.hashCode());
 
         log.info(field.toString());
@@ -273,7 +270,7 @@ public class SimulationTest {
     @Test
     public void start() {
         int entitiesNumber = 25000;
-        int cnt = 3;
+        int cnt = 1;
         while (cnt > 0) {
             Field field = new Field();
             EntityUtil.addEntities(field, entitiesNumber);

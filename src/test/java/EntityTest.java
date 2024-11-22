@@ -107,6 +107,6 @@ public class EntityTest {
         assertThrows(DeadEntityException.class, deer::getWeight);
         assertThrows(DeadEntityException.class, () -> deer.move(RIGHT));
         assertThrows(DeadEntityException.class, () -> deer.eat(plant));
-        assertThrows(DeadEntityException.class, () -> deer.multiply(plant));
+        assertThrows(DeadEntityException.class, () -> deer.multiplyWith(deer));
     }
 }

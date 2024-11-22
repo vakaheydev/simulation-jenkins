@@ -7,12 +7,14 @@ import simulation.entity.Point;
 import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.exception.DeadEntityException;
 import simulation.exception.TooMuchEntitiesException;
+import simulation.util.Validations;
 
 import java.util.List;
 import java.util.Random;
 
 import static simulation.entity.EntityConfig.getChanceToEat;
 import static simulation.util.PointUtil.getDirectionPoint;
+import static simulation.util.Validations.checkEntity;
 
 @Slf4j
 public abstract class Animal extends Entity {
@@ -28,22 +30,27 @@ public abstract class Animal extends Entity {
         super(field, x, y);
         populateChancesMap();
     }
+    protected abstract void populateChancesMap();
+    public abstract int speed();
 
-    public double eat(Entity entity) {
+    public abstract double neededFoodWeight();
+
+    public abstract Animal createNewInstance(Field field, int x, int y);
+
+    public void eat(Entity entity) {
         checkDeath();
-
         if (canEat(entity)) {
-            double chance = getChanceToEat(getClass(), entity.getClass());
-            if (randomEat(chance)) {
-                log.info("{} eats {}", this, entity);
-                double eatenWeight = entity.getWeight();
-                weight += eatenWeight;
-                entity.die();
-                return eatenWeight;
-            }
-            return 0;
+            eatInternally(entity);
         }
-        return 0;
+    }
+
+    private void eatInternally(Entity entity) {
+        double chance = getChanceToEat(getClass(), entity.getClass());
+        if (randomEat(chance)) {
+            log.info("{} eats {}", this, entity);
+            weight += entity.getWeight();
+            entity.die();
+        }
     }
 
     private boolean randomEat(double chance) {
@@ -52,35 +59,34 @@ public abstract class Animal extends Entity {
         return rnd.nextDouble() <= chance;
     }
 
-    protected boolean canEat(Entity entity) {
+    public boolean canEat(Entity entity) {
         return getChanceToEat(getClass(), entity.getClass()) > 0 && entity.isAlive();
     }
 
-    protected abstract void populateChancesMap();
-
-    public void multiply(Entity entity) {
+    public void multiplyWith(Animal entity) {
         checkDeath();
-        if (this.point.equals(entity.getPoint())) {
-            multiplyInternal(entity);
+        checkEntity(entity);
+
+        if (canMultiplyWith(entity)) {
+            multiplyWithInternal(entity);
         }
     }
 
-    private void multiplyInternal(Entity entity) {
-        checkDeath();
+    private void multiplyWithInternal(Entity entity) {
+        log.info("{} multiply with {}", this, entity);
+        createChildWith(entity);
+    }
 
-        if (this.getClass().equals(entity.getClass())) {
-            log.info("{} multiply with {}", this, entity);
-            try {
-                Animal newInstance = createNewInstance(this.field, point.x(), point.y());
-                log.debug("{} was born", newInstance);
-                if (hashCode() == newInstance.hashCode()) {
-                    log.error("Equals hash code: {} and {}", this, newInstance);
-                    log.error("Equals hash code: {} and {}", this.hashCode(), newInstance.hashCode());
-                    throw new IllegalStateException();
-                }
-            } catch (TooMuchEntitiesException e) {
-                log.error("{} wasn't added after multiplication because it is already too much of it", entity);
-            }
+    public boolean canMultiplyWith(Animal animal) {
+        return getClass().equals(animal.getClass()) && point.equals(animal.getPoint());
+    }
+
+    private void createChildWith(Entity entity) {
+        try {
+            Animal newInstance = createNewInstance(this.field, point.x(), point.y());
+            log.debug("{} was born", newInstance);
+        } catch (TooMuchEntitiesException e) {
+            log.warn("{} wasn't added after multiplication because it is already too much of it", entity);
         }
     }
 
@@ -92,9 +98,8 @@ public abstract class Animal extends Entity {
         }
 
         for (Direction direction : directions) {
-            moveTo(direction);
             try {
-                checkDeath();
+                moveTo(direction);
             } catch (DeadEntityException ignored) {
                 return;
             }
@@ -120,20 +125,20 @@ public abstract class Animal extends Entity {
             log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityGroupSet());
             loseWeight();
         }
+
+        checkDeath();
     }
 
     private void actOnEntityList(List<Entity> entities) {
         for (var other : entities) {
-            this.multiply(other);
             this.eat(other);
 
-            if (other instanceof Animal otherAnimal) {
-                if (other.isAlive()) {
-                    otherAnimal.eat(this);
-                }
+            if (other.isAnimal() && other.isAlive()) {
+                Animal otherAnimal = other.toAnimal();
+                this.multiplyWith(otherAnimal);
+                otherAnimal.eat(this);
             }
         }
-
     }
 
     /**
@@ -143,12 +148,6 @@ public abstract class Animal extends Entity {
         checkDeath();
         weight -= initialWeight() * 0.1;
     }
-
-    public abstract int speed();
-
-    public abstract double neededFoodWeight();
-
-    public abstract Animal createNewInstance(Field field, int x, int y);
 
     @Override
     public EntityType getEntityType() {
