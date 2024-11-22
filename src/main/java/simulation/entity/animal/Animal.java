@@ -7,7 +7,6 @@ import simulation.entity.Point;
 import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.exception.DeadEntityException;
 import simulation.exception.TooMuchEntitiesException;
-import simulation.util.Validations;
 
 import java.util.List;
 import java.util.Random;
@@ -30,7 +29,9 @@ public abstract class Animal extends Entity {
         super(field, x, y);
         populateChancesMap();
     }
+
     protected abstract void populateChancesMap();
+
     public abstract int speed();
 
     public abstract double neededFoodWeight();

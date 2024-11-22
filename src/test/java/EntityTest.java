@@ -1,8 +1,8 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import simulation.entity.Entity;
 import simulation.Field;
+import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.entity.animal.Plant;
 import simulation.entity.animal.herbivore.*;

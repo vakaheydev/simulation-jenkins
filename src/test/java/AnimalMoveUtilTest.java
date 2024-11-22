@@ -9,7 +9,6 @@ import simulation.entity.animal.herbivore.Herbivore;
 import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.util.AnimalMoveUtil;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static simulation.entity.animal.Animal.Direction.*;
 

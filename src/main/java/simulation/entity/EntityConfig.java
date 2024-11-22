@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EntityConfig {
-    private EntityConfig() {}
+    private EntityConfig() {
+    }
+
     private static final Map<Class<? extends Entity>, Map<Class<? extends Entity>, Double>> chances = new HashMap<>();
 
     public static void addChance(Class<? extends Entity> predatorClass, Class<? extends Entity> victimClass,
