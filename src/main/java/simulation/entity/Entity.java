@@ -2,7 +2,10 @@ package simulation.entity;
 
 import lombok.extern.slf4j.Slf4j;
 import simulation.Field;
+import simulation.entity.animal.Animal;
 import simulation.entity.animal.EntityType;
+import simulation.entity.animal.Plant;
+import simulation.exception.DeadEntityException;
 
 import java.util.Objects;
 
@@ -36,9 +39,32 @@ public abstract class Entity {
         return getEntityType().equals(EntityType.PLANT);
     }
 
+    public Animal toAnimal() {
+        if (isAnimal()) {
+            return (Animal) this;
+        }
+
+        return null;
+    }
+
+    public Plant toPlant() {
+        if (isPlant()) {
+            return (Plant) this;
+        }
+
+        return null;
+    }
+
     public void die() {
+        if (!isAlive()) {
+            log.error("Tried to kill already died animal");
+            return;
+        }
+
         log.debug("{} dies", this);
         field.removeEntity(this);
+        this.point = null;
+        this.field = null;
     }
 
     public abstract double initialWeight();
@@ -48,7 +74,7 @@ public abstract class Entity {
     public abstract EntityType getEntityType();
 
     public boolean isAlive() {
-        return field.getEntityPoint(this) != null;
+        return point != null;
     }
 
     @Override
@@ -58,15 +84,17 @@ public abstract class Entity {
         Entity entity = (Entity) object;
         return
                 Objects.equals(field, entity.field) &&
-                Objects.equals(point, entity.point) &&
-                Objects.equals(weight, entity.weight) &&
-                Objects.equals(hashId, entity.hashId);
+                        Objects.equals(point, entity.point) &&
+                        Objects.equals(weight, entity.weight) &&
+                        Objects.equals(hashId, entity.hashId) &&
+                        Objects.equals(hashCode, entity.hashCode);
     }
 
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashId = 7919 * 101 + field.getEntityGroup(point).entityCnt(getClass());
+            int entityCnt = field.getEntityGroup(point).entityCnt(getClass());
+            hashId = 7919 * 101 + entityCnt;
             hashCode = Objects.hash(this.getClass().getSimpleName(), this.point, this.hashId, this.weight);
         }
 
@@ -75,13 +103,27 @@ public abstract class Entity {
 
     @Override
     public String toString() {
-        String strHashCode = (hashCode != null) ? String.valueOf(hashCode % 100) : "undefined";
-        return String.format("%s@%s[%.2f kg] in %s", getClass().getSimpleName(), strHashCode, weight, point);
+        String strHashCode = (hashCode != null ? String.valueOf(hashCode % 1000) : "undefined");
+        String strPoint = (isAlive() ? String.format("in %s", point.toString()) : "dead");
+        return String.format("%s@%s[%.2f kg] %s", getClass().getSimpleName(), strHashCode, weight, strPoint);
     }
 
     public double getWeight() {
+        checkDeath();
         return weight;
     }
+
+    protected void checkDeath() {
+        if (!isAlive()) {
+            throw new DeadEntityException(this);
+        }
+
+        if (weight <= 0) {
+            die();
+            throw new DeadEntityException(this);
+        }
+    }
+
     public Point getPoint() {
         return point;
     }

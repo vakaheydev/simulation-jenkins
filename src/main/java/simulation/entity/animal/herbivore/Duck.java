@@ -3,6 +3,8 @@ package simulation.entity.animal.herbivore;
 import simulation.Field;
 import simulation.entity.animal.Animal;
 
+import static simulation.entity.EntityConfig.addChance;
+
 public class Duck extends Herbivore {
     public Duck() {
     }
@@ -14,7 +16,7 @@ public class Duck extends Herbivore {
     @Override
     protected void populateChancesMap() {
         super.populateChancesMap();
-        addChance(Caterpillar.class, 1.0);
+        addChance(getClass(), Caterpillar.class, 1.0);
     }
 
     @Override

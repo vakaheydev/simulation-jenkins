@@ -23,7 +23,7 @@ public class PointUtilTest {
 
         Assertions.assertEquals(1, field.plantCnt());
         Assertions.assertEquals(1, field.getEntityGroup(point).entityCnt(Plant.class));
-        Assertions.assertEquals(point, field.getEntityPoint(plant));
+        Assertions.assertEquals(point, plant.getPoint());
 
         log.info(field.toString());
     }

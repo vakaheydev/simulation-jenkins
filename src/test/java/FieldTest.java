@@ -22,13 +22,13 @@ public class FieldTest {
         Deer deer = new Deer(field, 0, 1);
         Plant plant = new Plant(field, 0, 0);
 
-        assertEquals(new Point(0, 1), field.getEntityPoint(deer));
-        assertEquals(new Point(0, 0), field.getEntityPoint(plant));
+        assertEquals(new Point(0, 1), deer.getPoint());
+        assertEquals(new Point(0, 0), plant.getPoint());
 
         deer.move(UP);
 
-        assertEquals(new Point(0, 0), field.getEntityPoint(deer));
-        assertNull(field.getEntityPoint(plant));
+        assertEquals(new Point(0, 0), deer.getPoint());
+        assertNull(plant.getPoint());
         assertEquals(1, field.entityCnt());
         assertEquals(1, field.animalCnt());
         assertEquals(0, field.plantCnt());

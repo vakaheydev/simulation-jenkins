@@ -4,17 +4,15 @@ import org.junit.jupiter.api.Test;
 import simulation.entity.Entity;
 import simulation.Field;
 import simulation.entity.Point;
-import simulation.entity.animal.herbivore.Buffalo;
-import simulation.entity.animal.herbivore.Caterpillar;
-import simulation.entity.animal.herbivore.Duck;
-import simulation.entity.animal.herbivore.Mouse;
+import simulation.entity.animal.Plant;
+import simulation.entity.animal.herbivore.*;
+import simulation.exception.DeadEntityException;
 import simulation.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static simulation.entity.animal.Animal.Direction.*;
 
 public class EntityTest {
@@ -31,17 +29,31 @@ public class EntityTest {
         EntityUtil.addEntities(field, new Point(0, 0), Duck.class, 199);
         EntityUtil.addEntities(field, new Point(0, 1), Mouse.class, 499);
         EntityUtil.addEntities(field, new Point(0, 2), Caterpillar.class, 999);
+        EntityUtil.addEntities(field, new Point(12, 99), Caterpillar.class, 999);
 
-        checkEntityGroup(field.getEntityGroup(0, 0), Duck.class);
-        checkEntityGroup(field.getEntityGroup(0, 1), Mouse.class);
-        checkEntityGroup(field.getEntityGroup(0, 2), Caterpillar.class);
+        checkDifferentHashCodeOnEntityGroup(field.getEntityGroup(0, 0));
+        checkDifferentHashCodeOnEntityGroup(field.getEntityGroup(0, 1));
+        checkDifferentHashCodeOnEntityGroup(field.getEntityGroup(0, 2));
+        checkDifferentHashCodeOnEntityGroup(field.getEntityGroup(12, 99));
     }
 
-    public void checkEntityGroup(Field.EntityGroup group, Class<? extends Entity> clazz) {
-        List<Entity> entities = new ArrayList<>(group.getEntities());
+    @DisplayName("Different hash codes after multiplying")
+    @Test
+    public void testEntityShouldHaveDifferentHashCodeAfterMultiplying() {
+        EntityUtil.addEntities(field, new Point(5, 5), Deer.class, 10);
+        EntityUtil.addEntities(field, new Point(5, 4), Deer.class, 1);
 
-        Entity entity = EntityUtil.newInstance(field, clazz);
+        field.getEntityGroup(5, 4)
+                .getEntityGroupSet()
+                .get(0)
+                .toAnimal()
+                .move(UP);
 
+        checkDifferentHashCodeOnEntityGroup(field.getEntityGroup(5, 5));
+    }
+
+    public static void checkDifferentHashCodeOnEntityGroup(Field.EntityGroup group) {
+        List<Entity> entities = new ArrayList<>(group.getEntityGroupSet());
 
         for (int i = 0; i < entities.size(); i++) {
             int hashCode = entities.get(i).hashCode();
@@ -59,7 +71,7 @@ public class EntityTest {
 
     @DisplayName("Equals hash codes")
     @Test
-    public void shouldHaveSameHashCode() {
+    public void testShouldHaveSameHashCode() {
         Buffalo buffalo = new Buffalo(field, 5, 5);
         int hashCode = buffalo.hashCode();
 
@@ -74,5 +86,27 @@ public class EntityTest {
 
         buffalo.move(LEFT);
         assertEquals(hashCode, buffalo.hashCode());
+    }
+
+    @DisplayName("Entity should die")
+    @Test
+    public void testEntityShouldDie() {
+        Plant plant = new Plant(field, 15, 22);
+        Deer deer = new Deer(field, 14, 22);
+        deer.move(RIGHT);
+
+        assertFalse(plant.isAlive());
+        assertNull(plant.getPoint());
+
+        assertTrue(deer.isAlive());
+        assertNotNull(deer.getPoint());
+
+        deer.die();
+
+        assertThrows(DeadEntityException.class, plant::getWeight);
+        assertThrows(DeadEntityException.class, deer::getWeight);
+        assertThrows(DeadEntityException.class, () -> deer.move(RIGHT));
+        assertThrows(DeadEntityException.class, () -> deer.eat(plant));
+        assertThrows(DeadEntityException.class, () -> deer.multiply(plant));
     }
 }

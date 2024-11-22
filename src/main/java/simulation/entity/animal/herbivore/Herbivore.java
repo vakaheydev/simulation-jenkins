@@ -4,6 +4,8 @@ import simulation.Field;
 import simulation.entity.animal.Animal;
 import simulation.entity.animal.Plant;
 
+import static simulation.entity.EntityConfig.addChance;
+
 public abstract class Herbivore extends Animal {
     public Herbivore() {
     }
@@ -14,6 +16,6 @@ public abstract class Herbivore extends Animal {
 
     @Override
     protected void populateChancesMap() {
-        addChance(Plant.class, 1.0);
+        addChance(getClass(), Plant.class, 1.0);
     }
 }

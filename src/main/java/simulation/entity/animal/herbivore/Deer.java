@@ -33,6 +33,6 @@ public class Deer extends Herbivore {
 
     @Override
     public Animal createNewInstance(Field field, int x, int y) {
-        return new Duck(field, x, y);
+        return new Deer(field, x, y);
     }
 }

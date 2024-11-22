@@ -4,6 +4,8 @@ import simulation.Field;
 import simulation.entity.animal.Animal;
 import simulation.entity.animal.herbivore.*;
 
+import static simulation.entity.EntityConfig.addChance;
+
 public class Bear extends Predator {
     public Bear() {
     }
@@ -24,16 +26,16 @@ public class Bear extends Predator {
 
     @Override
     protected void populateChancesMap() {
-        addChance(Boa.class, 0.8);
-        addChance(Horse.class, 0.4);
-        addChance(Deer.class, 0.8);
-        addChance(Rabbit.class, 0.8);
-        addChance(Mouse.class, 0.9);
-        addChance(Goat.class, 0.7);
-        addChance(Sheep.class, 0.7);
-        addChance(Boar.class, 0.5);
-        addChance(Buffalo.class, 0.2);
-        addChance(Duck.class, 0.1);
+        addChance(getClass(), Boa.class, 0.8);
+        addChance(getClass(), Horse.class, 0.4);
+        addChance(getClass(), Deer.class, 0.8);
+        addChance(getClass(), Rabbit.class, 0.8);
+        addChance(getClass(), Mouse.class, 0.9);
+        addChance(getClass(), Goat.class, 0.7);
+        addChance(getClass(), Sheep.class, 0.7);
+        addChance(getClass(), Boar.class, 0.5);
+        addChance(getClass(), Buffalo.class, 0.2);
+        addChance(getClass(), Duck.class, 0.1);
     }
 
     @Override

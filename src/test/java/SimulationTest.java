@@ -3,12 +3,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import simulation.Field;
+import simulation.entity.Entity;
 import simulation.entity.Point;
+import simulation.entity.animal.Animal;
 import simulation.entity.animal.Plant;
 import simulation.entity.animal.herbivore.*;
 import simulation.entity.animal.predator.Bear;
 import simulation.entity.animal.predator.Boa;
 import simulation.entity.animal.predator.Fox;
+import simulation.exception.AnimalSpeedLimitExceededException;
+import simulation.exception.DeadEntityException;
+import simulation.util.AnimalMoveUtil;
 import simulation.util.EntityUtil;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,18 +54,17 @@ public class SimulationTest {
         assertEquals(3, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        assertEquals(new Point(1, 2), field.getEntityPoint(duck));
-        assertEquals(new Point(5, 4), field.getEntityPoint(caterpillar2));
-
-        assertEquals(2, field.getEntityGroup(1, 2).size());
-        assertEquals(1, field.getEntityGroup(5, 4).size());
-        assertEquals(0, field.plantCnt());
+        assertEquals(new Point(1, 2), duck.getPoint());
+        assertEquals(new Point(5, 4), caterpillar2.getPoint());
 
         assertFalse(caterpillar3.isAlive());
         assertFalse(caterpillar.isAlive());
         assertFalse(duck2.isAlive());
-
         assertTrue(duck.isAlive());
+
+        assertEquals(2, field.getEntityGroup(1, 2).size());
+        assertEquals(1, field.getEntityGroup(5, 4).size());
+        assertEquals(0, field.plantCnt());
     }
 
     @DisplayName("Herbivore should eat all plants in location")
@@ -82,6 +86,28 @@ public class SimulationTest {
         assertEquals(830.0, buffalo.getWeight());
 
         log.info(field.toString());
+    }
+
+    @DisplayName("Rabbit eats and multiply")
+    @Test
+    public void testRabbitShouldEatAndMultiply() {
+        Rabbit rabbit = new Rabbit(field, 5, 5);
+        Rabbit rabbit2 = new Rabbit(field, 6, 5);
+        Plant plant = new Plant(field, 6, 5);
+        Plant plant2 = new Plant(field, 6, 5);
+
+        assertEquals(4, field.entityCnt());
+        assertEquals(2, field.animalCnt());
+        assertEquals(2, field.plantCnt());
+
+        rabbit.move(RIGHT);
+
+        assertEquals(3, field.entityCnt());
+        assertEquals(3, field.animalCnt());
+        assertEquals(0, field.plantCnt());
+
+        log.info(field.toString());
+
     }
 
     @DisplayName("Predator should eat herbivore")
@@ -144,7 +170,7 @@ public class SimulationTest {
         assertEquals(1, field.animalCnt());
         assertEquals(0, field.plantCnt());
 
-        assertThrows(IllegalArgumentException.class, () -> fox.move(
+        assertThrows(AnimalSpeedLimitExceededException.class, () -> fox.move(
                 UP, UP, RIGHT));
     }
 
@@ -159,23 +185,23 @@ public class SimulationTest {
 
         goat.move(LEFT);
 
-        assertEquals(new Point(4, 0), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 0), goat.getPoint());
 
         goat.move(DOWN);
 
-        assertEquals(new Point(4, 1), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 1), goat.getPoint());
 
         goat.move(UP);
 
-        assertEquals(new Point(4, 0), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 0), goat.getPoint());
 
         goat.move(RIGHT, DOWN, DOWN);
 
-        assertEquals(new Point(5, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(5, 2), goat.getPoint());
 
         goat.move(UP, DOWN);
 
-        assertEquals(new Point(5, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(5, 2), goat.getPoint());
 
         goat.move(DOWN, UP);
 
@@ -197,49 +223,99 @@ public class SimulationTest {
 
         goat.move(LEFT);
 
-        assertEquals(new Point(4, 0), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 0), goat.getPoint());
 
         goat.move(DOWN);
 
-        assertEquals(new Point(4, 1), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 1), goat.getPoint());
 
         goat.move(UP);
 
-        assertEquals(new Point(4, 0), field.getEntityPoint(goat));
+        assertEquals(new Point(4, 0), goat.getPoint());
 
         goat.move(RIGHT, DOWN, DOWN);
 
-        assertEquals(new Point(5, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(5, 2), goat.getPoint());
 
         goat.move(UP, DOWN);
 
-        assertEquals(new Point(5, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(5, 2), goat.getPoint());
 
         EntityUtil.addEntities(field, new Point(5, 2), Plant.class, 100);
 
         goat.move(DOWN, UP);
 
-        assertEquals(new Point(5, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(5, 2), goat.getPoint());
 
         goat.move(LEFT, LEFT, LEFT);
 
-        assertEquals(new Point(2, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(2, 2), goat.getPoint());
 
         goat.move(LEFT, RIGHT);
 
-        assertEquals(new Point(2, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(2, 2), goat.getPoint());
 
         goat.move(RIGHT, LEFT);
 
-        assertEquals(new Point(2, 2), field.getEntityPoint(goat));
+        assertEquals(new Point(2, 2), goat.getPoint());
 
         goat.move(LEFT, LEFT);
         goat.move(UP, UP);
 
-        assertEquals(new Point(0, 0), field.getEntityPoint(goat));
+        assertEquals(new Point(0, 0), goat.getPoint());
 
         Field.EntityGroup group = field.getEntityGroup(0, 0);
 
         assertEquals(2, group.size());
+    }
+
+    @DisplayName("Stress test of simulation ")
+    @Test
+    public void start() {
+        int entitiesNumber = 25000;
+        int cnt = 3;
+        while (cnt > 0) {
+            Field field = new Field();
+            EntityUtil.addEntities(field, entitiesNumber);
+            System.out.println(field.shortToString());
+            var entities = field.getEntities();
+            for (Entity entity : entities) {
+                tryToMove(field, entity.toAnimal());
+            }
+            System.out.println(field.shortToString());
+            System.out.println("\n\n--------------------------");
+            cnt--;
+        }
+    }
+
+    public void tryToMove(Field field, Animal animal) {
+        if (animal == null) {
+            return;
+        }
+
+        try {
+            AnimalMoveUtil.randomMove(field, animal);
+            checkCounters(field);
+        } catch (DeadEntityException | AnimalSpeedLimitExceededException ignored) {
+
+        }
+    }
+
+    public void checkCounters(Field field) {
+        var entities = field.getEntities();
+        int animalCnt = 0;
+        int plantCnt = 0;
+
+        for (Entity entity : entities) {
+            if (entity.isAnimal()) {
+                animalCnt++;
+            } else if (entity.isPlant()) {
+                plantCnt++;
+            }
+        }
+
+        assertEquals(animalCnt, field.animalCnt());
+        assertEquals(plantCnt, field.plantCnt());
+        assertEquals(plantCnt + animalCnt, field.entityCnt());
     }
 }

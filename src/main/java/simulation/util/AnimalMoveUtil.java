@@ -18,6 +18,7 @@ public final class AnimalMoveUtil {
     }
 
     public static void randomMove(Field field, Animal animal) {
+        Validations.checkEntity(animal);
         Direction rndDirection = PointUtil.getRandomDirection(field, animal.getPoint());
         animal.move(rndDirection);
     }

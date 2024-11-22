@@ -6,9 +6,11 @@ import simulation.entity.Point;
 import simulation.entity.animal.Animal;
 import simulation.entity.animal.herbivore.Caterpillar;
 import simulation.entity.animal.herbivore.Herbivore;
+import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.util.AnimalMoveUtil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static simulation.entity.animal.Animal.Direction.*;
 
 @Slf4j
@@ -44,8 +46,7 @@ public class AnimalMoveUtilTest {
         }
 
         @Override
-        public double loseWeight() {
-            return weight;
+        public void loseWeight() {
         }
     }
 
@@ -138,8 +139,6 @@ public class AnimalMoveUtilTest {
     @Test
     void testAnimalWithZeroSpeedMove() {
         Animal animal = new Caterpillar(field, 0, 0);
-        AnimalMoveUtil.randomMove(field, animal);
-        assertEquals(new Point(0, 0), field.getEntityPoint(animal));
-        assertEquals(new Point(0, 0), animal.getPoint());
+        assertThrows(AnimalSpeedLimitExceededException.class, () -> AnimalMoveUtil.randomMove(field, animal));
     }
 }

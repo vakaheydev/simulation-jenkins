@@ -1,7 +1,7 @@
 package simulation.util;
 
-import simulation.entity.Entity;
 import simulation.Field;
+import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.entity.animal.Animal;
 
@@ -17,7 +17,16 @@ public final class PointUtil {
     private PointUtil() {
     }
 
-    ;
+    public static Point getDirectionPoint(Point curPoint, Animal.Direction direction) {
+        int x = curPoint.x();
+        int y = curPoint.y();
+        return switch (direction) {
+            case RIGHT -> new Point(x + 1, y);
+            case LEFT -> new Point(x - 1, y);
+            case UP -> new Point(x, y - 1);
+            case DOWN -> new Point(x, y + 1);
+        };
+    }
 
     public static Animal.Direction getRandomDirection(Field field, Point point) {
         List<Animal.Direction> possibleDirections = getDirections(field, point);

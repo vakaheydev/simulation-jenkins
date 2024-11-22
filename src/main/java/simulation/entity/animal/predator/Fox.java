@@ -7,6 +7,8 @@ import simulation.entity.animal.herbivore.Duck;
 import simulation.entity.animal.herbivore.Mouse;
 import simulation.entity.animal.herbivore.Rabbit;
 
+import static simulation.entity.EntityConfig.addChance;
+
 public class Fox extends Predator {
     public Fox() {
     }
@@ -27,10 +29,10 @@ public class Fox extends Predator {
 
     @Override
     protected void populateChancesMap() {
-        addChance(Rabbit.class, 0.7);
-        addChance(Mouse.class, 0.9);
-        addChance(Duck.class, 0.6);
-        addChance(Caterpillar.class, 0.4);
+        addChance(getClass(), Rabbit.class, 0.7);
+        addChance(getClass(), Mouse.class, 0.9);
+        addChance(getClass(), Duck.class, 0.6);
+        addChance(getClass(), Caterpillar.class, 0.4);
     }
 
     @Override

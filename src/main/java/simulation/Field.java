@@ -6,72 +6,96 @@ import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+
+import static simulation.util.Validations.*;
 
 @Slf4j
 public class Field {
-    public class EntityGroup {
-        private final Set<Entity> entities;
-        private final Map<Class<? extends Entity>, Integer> entititesCntMap;
+    // <--- Public --->
+    public static class EntityGroup {
+        // <--- Private --->
+        private record Pair(int real, int hash) {
+            public Pair increase() {
+                return new Pair(real + 1, hash + 1);
+            }
+
+            public Pair decrease() {
+                return new Pair(real - 1, hash);
+            }
+        }
+
+        private Set<Entity> entityGroupSet;
+        private final Map<Class<? extends Entity>, Pair> entititesCntMap;
 
         public EntityGroup() {
-            entities = ConcurrentHashMap.newKeySet();
+            entityGroupSet = new HashSet<>();
             entititesCntMap = new HashMap<>();
         }
 
         public EntityGroup(EntityGroup group) {
-            entities = Set.copyOf(group.entities);
+            entityGroupSet = Set.copyOf(group.entityGroupSet);
             entititesCntMap = Map.copyOf(group.entititesCntMap);
         }
 
         public void addEntity(Entity entity) {
-            entities.add(entity);
-            entititesCntMap.merge(entity.getClass(), 1, Integer::sum);
+            entityGroupSet.add(entity);
+            entititesCntMap.compute(entity.getClass(), (k, v) -> {
+                if (v == null) {
+                    return new Pair(1, 1);
+                } else {
+                    return v.increase();
+                }
+            });
         }
 
         public void removeEntity(Entity entity) {
-            entities.remove(entity);
-            entititesCntMap.merge(entity.getClass(), 1, (oldValue, subtrahend) -> oldValue - subtrahend);
+            entityGroupSet.remove(entity);
+            entititesCntMap.computeIfPresent(entity.getClass(), (k, v) -> v.decrease());
         }
 
-        public final List<Entity> getEntities() {
-            return List.copyOf(entities);
+        public final List<Entity> getEntityGroupSet() {
+            return List.copyOf(entityGroupSet);
         }
 
         public int entityCnt(Class<? extends Entity> clazz) {
-            return entititesCntMap.getOrDefault(clazz, 0);
+            Pair pair = entititesCntMap.get(clazz);
+
+            return pair == null ? 0 : pair.real;
         }
 
         public void iterate(Consumer<Entity> func) {
-            for (var entity : entities) {
+            for (var entity : entityGroupSet) {
                 func.accept(entity);
             }
         }
 
         public int size() {
-            return entities.size();
+            return entityGroupSet.size();
         }
 
         @Override
         public String toString() {
             return "EntityGroup{" +
-                    entities.size() +
+                    entityGroupSet.size() +
                     " entities" +
                     '}';
         }
     }
 
-    private final Map<Entity, Point> entityPointMap;
-    private final EntityGroup[][] field;
-    private int animalCnt = 0;
-    private int plantCnt = 0;
     public final int height = 100;
     public final int width = 20;
 
+    // <--- Private --->
+
+    private final EntityGroup[][] field;
+    private final List<Entity> entityList;
+    private int animalCnt = 0;
+    private int plantCnt = 0;
+
     public Field() {
-        entityPointMap = new HashMap<>();
         field = new EntityGroup[height][width];
+        entityList = new ArrayList<>();
 
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[i].length; j++) {
@@ -81,106 +105,75 @@ public class Field {
     }
 
     public void addEntity(int x, int y, Entity entity) {
-        requireNonNull(entity);
-        checkPos(x, y);
-        try {
-            checkMaxQuantity(entity, x, y);
-        } catch (TooMuchEntitiesException e) {
-            throw e;
-        }
-
+        addEntityInternal(x, y, entity);
         increaseCounters(entity);
-        field[y][x].addEntity(entity);
-        entityPointMap.put(entity, new Point(x, y));
     }
 
     public void removeEntity(Entity entity) {
-        requireNonNull(entity);
-        Point point = entityPointMap.get(entity);
+        removeEntityInternal(entity);
         decreaseCounters(entity);
+    }
+
+    private void addEntityInternal(int x, int y, Entity entity) {
+        checkEntity(entity);
+        checkPoint(this, x, y);
+        checkEntitiesQuantity(this, entity, x, y);
+
+        entityList.add(entity);
+        field[y][x].addEntity(entity);
+    }
+
+    private void removeEntityInternal(Entity entity) {
+        checkEntity(entity);
+        Point point = entity.getPoint();
+
         field[point.y()][point.x()].removeEntity(entity);
-        entityPointMap.remove(entity);
+        entityList.remove(entity);
     }
 
     private void increaseCounters(Entity entity) {
-        requireNonNull(entity);
-        if (!entityPointMap.containsKey(entity)) {
-            if (entity.isPlant()) {
-                plantCnt++;
-            } else if (entity.isAnimal()) {
-                animalCnt++;
-            }
+        if (entity.isPlant()) {
+            plantCnt++;
+        } else if (entity.isAnimal()) {
+            animalCnt++;
         }
     }
 
     public void decreaseCounters(Entity entity) {
-        requireNonNull(entity);
-        if (entityPointMap.containsKey(entity)) {
-            if (entity.isPlant()) {
-                plantCnt--;
-            } else if (entity.isAnimal()) {
-                animalCnt--;
-            }
+        if (entity.isPlant()) {
+            plantCnt--;
+        } else if (entity.isAnimal()) {
+            animalCnt--;
         }
     }
 
-    public void moveEntity(Point from, Point to,  Entity entity) {
-        requireNonNull(entity);
-        removeEntity(entity);
+    public void moveEntity(Point from, Point to, Entity entity) {
+        checkEntity(entity);
+        removeEntityInternal(entity);
         try {
-            addEntity(to.x(), to.y(), entity);
+            addEntityInternal(to.x(), to.y(), entity);
         } catch (TooMuchEntitiesException e) {
-            addEntity(from.x(), from.y(), entity);
+            addEntityInternal(from.x(), from.y(), entity);
             log.debug("{} wasn't added because it is already too much of it", entity);
         }
     }
 
     public EntityGroup getEntityGroup(int x, int y) {
-        checkPos(x, y);
+        checkPoint(this, x, y);
         return new EntityGroup(field[y][x]);
     }
 
-    public Set<Entity> getEntities(int x, int y) {
-        checkPos(x, y);
-        return field[y][x].entities;
-    }
-
     public EntityGroup getEntityGroup(Point point) {
-        checkPos(point.x(), point.y());
+        checkPoint(this, point.x(), point.y());
         return field[point.y()][point.x()];
     }
 
-    public Point getEntityPoint(Entity entity) {
-        requireNonNull(entity);
-        return entityPointMap.get(entity);
+    public List<Entity> getEntities() {
+        return List.copyOf(entityList);
     }
 
-    private void checkPos(int x, int y) {
-        if (y < 0 || y > height - 1) {
-            throw new IllegalArgumentException(String.format("x (%d) must be in bounds: [%d - %d]", x, 0,
-                    height - 1));
-        }
-        if (x < 0 || x > width - 1) {
-            throw new IllegalArgumentException(String.format("y (%d) must be in bounds: [%d - %d]", y, 0,
-                    width - 1));
-        }
-    }
-
-    private void checkMaxQuantity(Entity entity, int x, int y) {
-        requireNonNull(entity);
-        if (field[y][x].entityCnt(entity.getClass()) == entity.maxQuantity()) {
-            throw new TooMuchEntitiesException(entity);
-        }
-    }
-
-    public Set<Entity> getEntities() {
-        return Set.copyOf(entityPointMap.keySet());
-    }
-
-    public static void requireNonNull(Object obj) {
-        if (obj == null) {
-            throw new IllegalArgumentException("Can't be null");
-        }
+    public boolean containsEntity(Entity entity) {
+        return entityList.contains(entity);
     }
 
     @Override
@@ -193,9 +186,8 @@ public class Field {
         sb.append(plantCnt).append(" plants").append("\n");
         sb.append("\n");
 
-        for (var entry : entityPointMap.entrySet()) {
-            sb.append(entry.getKey()).append("\n");
-        }
+        entityList.forEach(x -> sb.append(x).append("\n"));
+
         sb.append("\n<----------------------->").append("\n");
         return sb.toString();
     }
@@ -212,7 +204,7 @@ public class Field {
     }
 
     public int entityCnt() {
-        return entityPointMap.size();
+        return entityList.size();
     }
 
     public int animalCnt() {
@@ -224,11 +216,11 @@ public class Field {
     }
 
     public void clear() {
-        entityPointMap.clear();
-        for (int i = 0; i < field.length; i++) {
-            for (int j = 0; j < field[i].length; j++) {
-                field[i][j].entities.clear();
-                field[i][j].entititesCntMap.clear();
+        entityList.clear();
+        for (EntityGroup[] entityGroups : field) {
+            for (EntityGroup entityGroup : entityGroups) {
+                entityGroup.entityGroupSet.clear();
+                entityGroup.entititesCntMap.clear();
             }
         }
         animalCnt = 0;

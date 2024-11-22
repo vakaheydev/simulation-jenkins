@@ -1,7 +1,7 @@
 package simulation.util;
 
-import simulation.entity.Entity;
 import simulation.Field;
+import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.entity.animal.Plant;
 import simulation.entity.animal.herbivore.*;
