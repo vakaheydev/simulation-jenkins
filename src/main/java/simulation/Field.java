@@ -27,7 +27,7 @@ public class Field {
             }
         }
 
-        private Set<Entity> entityGroupSet;
+        private final Set<Entity> entityGroupSet;
         private final Map<Class<? extends Entity>, Pair> entititesCntMap;
 
         public EntityGroup() {
@@ -92,8 +92,8 @@ public class Field {
 
     private final EntityGroup[][] field;
     private final List<Entity> entityList;
-    private AtomicInteger animalCnt = new AtomicInteger(0);
-    private AtomicInteger plantCnt = new AtomicInteger(0);
+    private final AtomicInteger animalCnt = new AtomicInteger(0);
+    private final AtomicInteger plantCnt = new AtomicInteger(0);
 
     public Field() {
         field = new EntityGroup[height][width];
@@ -226,7 +226,7 @@ public class Field {
                 entityGroup.entititesCntMap.clear();
             }
         }
-        animalCnt = new AtomicInteger(0);
-        plantCnt = new AtomicInteger(0);
+        animalCnt.set(0);
+        plantCnt.set(0);
     }
 }

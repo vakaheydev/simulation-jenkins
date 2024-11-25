@@ -15,8 +15,7 @@ import simulation.entity.animal.predator.Bear;
 import simulation.entity.animal.predator.Wolf;
 import simulation.util.EntityUtil;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static simulation.util.EntityUtil.addEntities;
@@ -155,26 +154,19 @@ public class ConcurrentSimulationTest {
                 () -> new Rabbit(field, 5, 5),
                 (x) -> x.loopCounter.get() < 1);
 
-        Thread workerThread = new Thread(worker, "worker_I");
-        Thread workerThread2 = new Thread(worker, "worker_II");
-        Thread workerThread3 = new Thread(worker, "worker_III");
-        Thread deerSupplierThread = new Thread(deerSupplier, "deerSupplier");
-        Thread wolfSupplierThread = new Thread(wolfSupplier, "wolfSupplier");
-        Thread rabbitSupplierThread = new Thread(rabbitSupplier, "rabbitSupplier");
+        ExecutorService executor = Executors.newFixedThreadPool(6);
 
-        workerThread.start();
-        workerThread2.start();
-        workerThread3.start();
-        deerSupplierThread.start();
-        wolfSupplierThread.start();
-        rabbitSupplierThread.start();
+        executor.submit(worker);
+        executor.submit(worker);
+        executor.submit(worker);
+        executor.submit(deerSupplier);
+        executor.submit(wolfSupplier);
+        executor.submit(rabbitSupplier);
 
-        workerThread.join();
-        workerThread2.join();
-        workerThread3.join();
-        deerSupplierThread.join();
-        wolfSupplierThread.join();
-        rabbitSupplierThread.join();
+        executor.shutdown();
+        if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+            log.warn("Work didn't finished in expected time");
+        }
 
         Field.EntityGroup entityGroup = field.getEntityGroup(5, 4);
         log.info("Final entityGroup: {}", entityGroup);
