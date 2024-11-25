@@ -121,6 +121,7 @@ public class Field {
         checkPoint(this, x, y);
         checkEntitiesQuantity(this, entity, x, y);
 
+
         entityList.add(entity);
         field[y][x].addEntity(entity);
     }

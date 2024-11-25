@@ -3,29 +3,43 @@ package simulation.concurrent;
 import lombok.extern.slf4j.Slf4j;
 import simulation.Field;
 import simulation.entity.Entity;
-import simulation.entity.animal.Animal;
-import simulation.util.AnimalMoveUtil;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @Slf4j
-public class EntityWorker extends AbstractEntityWorker {
-    public EntityWorker(Field field, BlockingQueue<Entity> queue) {
-        super(field, queue);
+public class EntityWorker extends AbstractEntityProcessor {
+    protected final Consumer<Entity> consumer;
+    protected final Predicate<EntityWorker> loopPredicate;
+
+    public EntityWorker(Field field, BlockingQueue<Entity> queue, Consumer<Entity> consumer,
+                        Predicate<EntityWorker> loopPredicate) {
+        super(field, queue, 0);
+        this.consumer = consumer;
+        this.loopPredicate = loopPredicate;
     }
 
     @Override
-    public void work(Entity entity) {
-        if (!entity.isAlive()) {
-            log.info("Entity[{}] is dead", entity);
-            return;
+    public void process() {
+        log.debug("Worker started");
+
+        log.trace("Loop counter: {}", loopCounter);
+
+        Entity entity;
+
+        try {
+            entity = queue.take();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        if (entity.isAnimal()) {
-            Animal animal = entity.toAnimal();
-            if (animal.speed() > 0) {
-                AnimalMoveUtil.randomMove(field, entity.toAnimal());
-            }
-        }
+        log.debug("Got an entity: {}", entity);
+        consumer.accept(entity);
+    }
+
+    @Override
+    public boolean shouldContinue() {
+        return loopPredicate.test(this);
     }
 }

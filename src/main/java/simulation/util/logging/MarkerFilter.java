@@ -12,17 +12,17 @@ import java.util.List;
 
 import static ch.qos.logback.classic.Level.INFO;
 
-public class MarkerFilter extends Filter<ILoggingEvent> {
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        Marker markerToMatch = MarkerFactory.getMarker("IMPORTANT");
-        List<Marker> markerList = event.getMarkerList();
-        Level level = event.getLevel();
-
-        if (level.isGreaterOrEqual(INFO) || markerList.contains(markerToMatch)) {
-            return FilterReply.ACCEPT;
-        }
-
-        return FilterReply.DENY;
-    }
-}
+//public class MarkerFilter extends Filter<ILoggingEvent> {
+//    @Override
+//    public FilterReply decide(ILoggingEvent event) {
+//        Marker markerToMatch = MarkerFactory.getMarker("IMPORTANT");
+//        List<Marker> markerList = event.getMarkerList();
+//        Level level = event.getLevel();
+//
+//        if (level.isGreaterOrEqual(INFO) || markerList.contains(markerToMatch)) {
+//            return FilterReply.ACCEPT;
+//        }
+//
+//        return FilterReply.DENY;
+//    }
+//}

@@ -3,39 +3,42 @@ package simulation.concurrent;
 import lombok.extern.slf4j.Slf4j;
 import simulation.Field;
 import simulation.entity.Entity;
-import simulation.util.EntityUtil;
 
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Slf4j
-public class EntitySupplier extends AbstractEntitySupplier {
-    public EntitySupplier(Field field, BlockingQueue<Entity> queue) {
-        super(field, queue);
+public class EntitySupplier extends AbstractEntityProcessor {
+    protected final Supplier<Entity> supplier;
+    protected final Predicate<EntitySupplier> loopPredicate;
+
+    public EntitySupplier(Field field, BlockingQueue<Entity> queue, Supplier<Entity> supplier,
+                          Predicate<EntitySupplier> loopPredicate) {
+        super(field, queue, 0);
+        this.supplier = supplier;
+        this.loopPredicate = loopPredicate;
     }
 
     @Override
-    public Entity supply() {
-        List<Entity> entities;
+    public void process() {
+        log.debug("Supplier started");
+
+        log.trace("Loop counter: {}", loopCounter);
+
+        Entity entity = supplier.get();
+        log.debug("Supplied entity: {}", entity);
 
         try {
-            entities = field.getEntities();
-        } catch (NullPointerException exception) {
-            log.error("Error: null pointer");
-            throw new IllegalStateException();
+            queue.put(entity);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        log.debug("entityList: {}", entities);
-
-        int size = entities.size();
-
-        if (size < 10) {
-            Entity entity = EntityUtil.addEntity(field);
-            return entity;
-        }
-
-        int idx = new Random().nextInt(size);
-        return entities.get(idx);
+    @Override
+    public boolean shouldContinue() {
+        return loopPredicate.test(this);
     }
 }

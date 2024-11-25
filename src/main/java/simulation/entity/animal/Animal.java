@@ -7,6 +7,7 @@ import simulation.entity.Point;
 import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.exception.DeadEntityException;
 import simulation.exception.TooMuchEntitiesException;
+import simulation.util.Validations;
 
 import java.util.List;
 import java.util.Random;
@@ -92,6 +93,7 @@ public abstract class Animal extends Entity {
     }
 
     public void move(Direction... directions) {
+        Validations.checkNotNull(directions);
         checkDeath();
 
         if (directions.length > speed()) {
@@ -123,8 +125,8 @@ public abstract class Animal extends Entity {
         actOnEntityList(entities);
 
         if (isAlive()) {
-            log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityGroupSet());
             loseWeight();
+            log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityGroupSet());
         }
 
         checkDeath();
