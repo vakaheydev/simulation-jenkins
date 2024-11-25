@@ -2,12 +2,13 @@ package simulation.entity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityConfig {
     private EntityConfig() {
     }
 
-    private static final Map<Class<? extends Entity>, Map<Class<? extends Entity>, Double>> chances = new HashMap<>();
+    private static final Map<Class<? extends Entity>, Map<Class<? extends Entity>, Double>> chances = new ConcurrentHashMap<>();
 
     public static void addChance(Class<? extends Entity> predatorClass, Class<? extends Entity> victimClass,
                                  double chance) {

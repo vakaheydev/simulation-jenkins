@@ -46,7 +46,7 @@ public class EntityTest {
         EntityUtil.addEntities(field, new Point(5, 4), Deer.class, 1);
 
         field.getEntityGroup(5, 4)
-                .getEntityGroupSet()
+                .getEntityList()
                 .get(0)
                 .toAnimal()
                 .move(UP);
@@ -55,7 +55,7 @@ public class EntityTest {
     }
 
     public static void checkDifferentHashCodeOnEntityGroup(Field.EntityGroup group) {
-        List<Entity> entities = new ArrayList<>(group.getEntityGroupSet());
+        List<Entity> entities = new ArrayList<>(group.getEntityList());
 
         for (int i = 0; i < entities.size(); i++) {
             int hashCode = entities.get(i).hashCode();

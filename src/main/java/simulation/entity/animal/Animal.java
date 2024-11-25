@@ -114,7 +114,7 @@ public abstract class Animal extends Entity {
         int x = directionPoint.x();
         int y = directionPoint.y();
 
-        List<Entity> entities = field.getEntityGroup(x, y).getEntityGroupSet();
+        List<Entity> entities = field.getEntityGroup(x, y).getEntityList();
 
         log.debug("{} moving {} to {}", this, direction, directionPoint);
         log.trace("EntityGroup in {}: {}", directionPoint, entities);
@@ -126,7 +126,7 @@ public abstract class Animal extends Entity {
 
         if (isAlive()) {
             loseWeight();
-            log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityGroupSet());
+            log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityList());
         }
 
         checkDeath();

@@ -7,34 +7,44 @@ import simulation.Field;
 import simulation.concurrent.EntitySupplier;
 import simulation.concurrent.EntityWorker;
 import simulation.entity.Entity;
+import simulation.entity.Point;
 import simulation.entity.animal.Animal;
 import simulation.entity.animal.herbivore.Deer;
+import simulation.entity.animal.herbivore.Rabbit;
+import simulation.entity.animal.predator.Bear;
+import simulation.entity.animal.predator.Wolf;
+import simulation.util.EntityUtil;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static simulation.util.EntityUtil.addEntities;
+import static simulation.util.EntityUtil.getRandomClass;
 
 @Slf4j
 public class ConcurrentSimulationTest {
-    @DisplayName("One entity")
+    @DisplayName("1 sup | 1 work")
     @Test
-    public void testOneEntity() throws InterruptedException {
+    public void testOneSup() throws InterruptedException {
         Field field = new Field();
-        BlockingQueue<Entity> queue = new ArrayBlockingQueue<>(1);
+        int n = 1;
+        BlockingQueue<Entity> queue = new ArrayBlockingQueue<>(n);
 
         EntityWorker worker = new EntityWorker(field, queue, (x)  -> {
             Animal animal = x.toAnimal();
             log.debug("Got an animal: {}", animal);
+
             assertNotNull(animal);
+            assertTrue(animal.isAlive());
 
             animal.move(Animal.Direction.UP);
         },
-                (x) -> x.loopCounter.get() < 1);
+                (x) -> x.loopCounter.get() < n);
 
         EntitySupplier supplier = new EntitySupplier(field, queue,
                 () -> new Deer(field, 5, 5),
-                (x) -> x.loopCounter.get() < 1);
+                (x) -> x.loopCounter.get() < n);
 
         Thread workerThread = new Thread(worker, "worker");
         Thread supplierThread = new Thread(supplier, "supplier");
@@ -43,5 +53,141 @@ public class ConcurrentSimulationTest {
 
         workerThread.join();
         supplierThread.join();
+
+        Entity entity = field.getEntityGroup(5, 4).getEntityList().get(0);
+
+        assertNotNull(entity);
+        assertTrue(entity.isAlive());
+        assertEquals(270.0, entity.getWeight());
+        assertEquals(Deer.class, entity.getClass());
+
+        assertEquals(1, field.getEntities().size());
+        assertEquals(1, field.getEntityGroup(5, 4).size());
+    }
+
+    @DisplayName("3 sup | 1 work")
+    @Test
+    public void testThreeSup() throws InterruptedException {
+        Field field = new Field();
+        int n = 3;
+        BlockingQueue<Entity> queue = new ArrayBlockingQueue<>(n);
+
+        EntityWorker worker = new EntityWorker(field, queue, (x)  -> {
+            Animal animal = x.toAnimal();
+            log.debug("Got an animal: {}", animal);
+
+            assertNotNull(animal);
+            assertTrue(animal.isAlive());
+
+            animal.move(Animal.Direction.UP);
+        },
+                (x) -> x.loopCounter.get() < n);
+
+        EntitySupplier deerSupplier = new EntitySupplier(field, queue,
+                () -> new Deer(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        EntitySupplier wolfSupplier = new EntitySupplier(field, queue,
+                () -> new Wolf(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        EntitySupplier rabbitSupplier = new EntitySupplier(field, queue,
+                () -> new Rabbit(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        Thread workerThread = new Thread(worker, "worker");
+        Thread deerSupplierThread = new Thread(deerSupplier, "deerSupplier");
+        Thread wolfSupplierThread = new Thread(wolfSupplier, "wolfSupplier");
+        Thread rabbitSupplierThread = new Thread(rabbitSupplier, "rabbitSupplier");
+
+        workerThread.start();
+        deerSupplierThread.start();
+        wolfSupplierThread.start();
+        rabbitSupplierThread.start();
+
+        workerThread.join();
+        deerSupplierThread.join();
+        wolfSupplierThread.join();
+        rabbitSupplierThread.join();
+
+        Field.EntityGroup entityGroup = field.getEntityGroup(5, 4);
+        log.info("Final entityGroup: {}", entityGroup);
+        entityGroup.iterate((x) -> log.info(x.toString()));
+
+//        Entity entity = field.getEntityGroup(5, 4).getEntityList().get(0);
+//
+//        assertNotNull(entity);
+//        assertTrue(entity.isAlive());
+//        assertEquals(270.0, entity.getWeight());
+//        assertEquals(Deer.class, entity.getClass());
+//
+//        assertEquals(1, field.getEntities().size());
+//        assertEquals(1, field.getEntityGroup(5, 4).size());
+    }
+
+    @DisplayName("3 sup | 3 work")
+    @Test
+    public void testThreeSupThreeWork() throws InterruptedException {
+        Field field = new Field();
+        int n = 3;
+        BlockingQueue<Entity> queue = new ArrayBlockingQueue<>(n);
+
+        EntityWorker worker = new EntityWorker(field, queue, (x)  -> {
+            Animal animal = x.toAnimal();
+            log.debug("Got an animal: {}", animal);
+
+            assertNotNull(animal);
+            assertTrue(animal.isAlive());
+
+            animal.move(Animal.Direction.UP);
+        },
+                (x) -> x.loopCounter.get() < 1);
+
+        EntitySupplier deerSupplier = new EntitySupplier(field, queue,
+                () -> new Deer(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        EntitySupplier wolfSupplier = new EntitySupplier(field, queue,
+                () -> new Wolf(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        EntitySupplier rabbitSupplier = new EntitySupplier(field, queue,
+                () -> new Rabbit(field, 5, 5),
+                (x) -> x.loopCounter.get() < 1);
+
+        Thread workerThread = new Thread(worker, "worker_I");
+        Thread workerThread2 = new Thread(worker, "worker_II");
+        Thread workerThread3 = new Thread(worker, "worker_III");
+        Thread deerSupplierThread = new Thread(deerSupplier, "deerSupplier");
+        Thread wolfSupplierThread = new Thread(wolfSupplier, "wolfSupplier");
+        Thread rabbitSupplierThread = new Thread(rabbitSupplier, "rabbitSupplier");
+
+        workerThread.start();
+        workerThread2.start();
+        workerThread3.start();
+        deerSupplierThread.start();
+        wolfSupplierThread.start();
+        rabbitSupplierThread.start();
+
+        workerThread.join();
+        workerThread2.join();
+        workerThread3.join();
+        deerSupplierThread.join();
+        wolfSupplierThread.join();
+        rabbitSupplierThread.join();
+
+        Field.EntityGroup entityGroup = field.getEntityGroup(5, 4);
+        log.info("Final entityGroup: {}", entityGroup);
+        entityGroup.iterate((x) -> log.info(x.toString()));
+
+//        Entity entity = field.getEntityGroup(5, 4).getEntityList().get(0);
+//
+//        assertNotNull(entity);
+//        assertTrue(entity.isAlive());
+//        assertEquals(270.0, entity.getWeight());
+//        assertEquals(Deer.class, entity.getClass());
+//
+//        assertEquals(1, field.getEntities().size());
+//        assertEquals(1, field.getEntityGroup(5, 4).size());
     }
 }

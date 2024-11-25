@@ -22,10 +22,6 @@ public class EntityWorker extends AbstractEntityProcessor {
 
     @Override
     public void process() {
-        log.debug("Worker started");
-
-        log.trace("Loop counter: {}", loopCounter);
-
         Entity entity;
 
         try {

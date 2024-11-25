@@ -130,7 +130,7 @@ public class AnimalTest {
 
         EntityTest.checkDifferentHashCodeOnEntityGroup(entityGroup);
 
-        List<Entity> entities = entityGroup.getEntityGroupSet();
+        List<Entity> entities = entityGroup.getEntityList();
     }
 
     public void assertMoves(Animal animal, Direction... directions) {

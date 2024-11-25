@@ -94,6 +94,10 @@ public final class EntityUtil {
         return classes.get(new Random().nextInt(classes.size()));
     }
 
+    public static Class<? extends Entity> getRandomClass(Class<? extends Entity>... classes) {
+        return classes[new Random().nextInt(classes.length)];
+    }
+
     public static int getMaxQuantity(Field field, Class<? extends Entity> clazz) {
         try {
             Entity entity = clazz.getDeclaredConstructor().newInstance();

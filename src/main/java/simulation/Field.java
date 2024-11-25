@@ -1,12 +1,12 @@
 package simulation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Marker;
 import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -31,8 +31,8 @@ public class Field {
         private final Map<Class<? extends Entity>, Pair> entititesCntMap;
 
         public EntityGroup() {
-            entityGroupSet = new HashSet<>();
-            entititesCntMap = new HashMap<>();
+            entityGroupSet = ConcurrentHashMap.newKeySet();
+            entititesCntMap = new ConcurrentHashMap<>();
         }
 
         public EntityGroup(EntityGroup group) {
@@ -56,7 +56,7 @@ public class Field {
             entititesCntMap.computeIfPresent(entity.getClass(), (k, v) -> v.decrease());
         }
 
-        public final List<Entity> getEntityGroupSet() {
+        public final List<Entity> getEntityList() {
             return List.copyOf(entityGroupSet);
         }
 

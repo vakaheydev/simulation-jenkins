@@ -23,10 +23,6 @@ public class EntitySupplier extends AbstractEntityProcessor {
 
     @Override
     public void process() {
-        log.debug("Supplier started");
-
-        log.trace("Loop counter: {}", loopCounter);
-
         Entity entity = supplier.get();
         log.debug("Supplied entity: {}", entity);
 
