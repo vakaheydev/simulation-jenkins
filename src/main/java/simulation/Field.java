@@ -1,11 +1,13 @@
 package simulation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Marker;
 import simulation.entity.Entity;
 import simulation.entity.Point;
 import simulation.exception.TooMuchEntitiesException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static simulation.util.Validations.*;
@@ -90,8 +92,8 @@ public class Field {
 
     private final EntityGroup[][] field;
     private final List<Entity> entityList;
-    private int animalCnt = 0;
-    private int plantCnt = 0;
+    private AtomicInteger animalCnt = new AtomicInteger(0);
+    private AtomicInteger plantCnt = new AtomicInteger(0);
 
     public Field() {
         field = new EntityGroup[height][width];
@@ -133,17 +135,17 @@ public class Field {
 
     private void increaseCounters(Entity entity) {
         if (entity.isPlant()) {
-            plantCnt++;
+            plantCnt.incrementAndGet();
         } else if (entity.isAnimal()) {
-            animalCnt++;
+            animalCnt.incrementAndGet();
         }
     }
 
     public void decreaseCounters(Entity entity) {
         if (entity.isPlant()) {
-            plantCnt--;
+            plantCnt.decrementAndGet();
         } else if (entity.isAnimal()) {
-            animalCnt--;
+            animalCnt.decrementAndGet();
         }
     }
 
@@ -208,11 +210,11 @@ public class Field {
     }
 
     public int animalCnt() {
-        return animalCnt;
+        return animalCnt.get();
     }
 
     public int plantCnt() {
-        return plantCnt;
+        return plantCnt.get();
     }
 
     public void clear() {
@@ -223,7 +225,7 @@ public class Field {
                 entityGroup.entititesCntMap.clear();
             }
         }
-        animalCnt = 0;
-        plantCnt = 0;
+        animalCnt = new AtomicInteger(0);
+        plantCnt = new AtomicInteger(0);
     }
 }

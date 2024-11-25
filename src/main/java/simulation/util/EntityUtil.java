@@ -8,6 +8,7 @@ import simulation.entity.animal.herbivore.*;
 import simulation.entity.animal.predator.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -21,12 +22,16 @@ public final class EntityUtil {
         }
     }
 
-    public static void addEntities(Field field, Point point, Class<? extends Entity> clazz, int amount) {
+    public static List<Entity> addEntities(Field field, Point point, Class<? extends Entity> clazz, int amount) {
+        List<Entity> entityList = new ArrayList<>();
         checkMaxQuantity(field, clazz, amount);
 
         for (int i = 0; i < amount; i++) {
-            newInstance(field, point, clazz);
+            Entity entity = newInstance(field, point, clazz);
+            entityList.add(entity);
         }
+
+        return entityList;
     }
 
     private static void checkMaxQuantity(Field field, Class<? extends Entity> clazz, int amount) {
@@ -37,19 +42,33 @@ public final class EntityUtil {
         }
     }
 
-    public static void addEntities(Field field, Class<? extends Entity> clazz, int amount) {
+    public static List<Entity> addEntities(Field field, Class<? extends Entity> clazz, int amount) {
+        List<Entity> entityList = new ArrayList<>();
+
         for (int i = 0; i < amount; i++) {
             Point point = PointUtil.getRandomPoint(field, clazz);
-            newInstance(field, point, clazz);
+            Entity entity = newInstance(field, point, clazz);
+            entityList.add(entity);
         }
+
+        return entityList;
     }
 
-    public static void addEntities(Field field, int amount) {
+    public static List<Entity> addEntities(Field field, int amount) {
+        List<Entity> entityList = new ArrayList<>();
+
         for (int i = 0; i < amount; i++) {
             Class<? extends Entity> clazz = getRandomClass();
             Point point = PointUtil.getRandomPoint(field, clazz);
-            newInstance(field, point, clazz);
+            Entity entity = newInstance(field, point, clazz);
+            entityList.add(entity);
         }
+
+        return entityList;
+    }
+
+    public static Entity addEntity(Field field) {
+        return addEntities(field, 1).get(0);
     }
 
     public static Class<? extends Entity> getRandomClass() {
