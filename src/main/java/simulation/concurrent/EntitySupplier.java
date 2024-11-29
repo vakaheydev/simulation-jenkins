@@ -5,7 +5,6 @@ import simulation.Field;
 import simulation.entity.Entity;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 

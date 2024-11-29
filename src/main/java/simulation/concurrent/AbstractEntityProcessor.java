@@ -20,13 +20,14 @@ public abstract class AbstractEntityProcessor implements Runnable {
     }
 
     public abstract void process();
+
     public abstract boolean shouldContinue();
 
     @Override
     public void run() {
         log.debug("Thread {{}} started", Thread.currentThread().getName());
 
-        while(shouldContinue()) {
+        while (shouldContinue()) {
             log.trace("Loop counter: {}", loopCounter);
             process();
             loopCounter.incrementAndGet();

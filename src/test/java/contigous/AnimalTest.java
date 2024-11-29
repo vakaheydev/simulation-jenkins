@@ -12,7 +12,6 @@ import simulation.entity.animal.Animal;
 import simulation.entity.animal.Animal.Direction;
 import simulation.entity.animal.Plant;
 import simulation.entity.animal.predator.Bear;
-import simulation.entity.animal.predator.Eagle;
 import simulation.entity.animal.predator.Wolf;
 import util.TestAnimal;
 

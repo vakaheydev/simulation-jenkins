@@ -10,7 +10,6 @@ import org.slf4j.MarkerFactory;
 import java.util.List;
 
 import static ch.qos.logback.classic.Level.ERROR;
-import static ch.qos.logback.classic.Level.INFO;
 
 public class MarkerFilter extends Filter<ILoggingEvent> {
     @Override

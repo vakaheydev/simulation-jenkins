@@ -10,7 +10,7 @@ import java.util.concurrent.Semaphore;
 
 @Slf4j
 public class InfiniteEntitySupplier extends EntitySupplier {
-    public InfiniteEntitySupplier(Field field, BlockingQueue<Entity> queue,  Semaphore semaphore) {
+    public InfiniteEntitySupplier(Field field, BlockingQueue<Entity> queue, Semaphore semaphore) {
         super(field, queue,
                 () -> {
 
