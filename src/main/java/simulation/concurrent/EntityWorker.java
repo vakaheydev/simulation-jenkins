@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 @Slf4j
 public class EntityWorker extends AbstractEntityProcessor {
+    protected Entity entity;
     protected final Consumer<Entity> consumer;
     protected final Predicate<EntityWorker> loopPredicate;
 
@@ -26,6 +27,7 @@ public class EntityWorker extends AbstractEntityProcessor {
 
         try {
             entity = queue.take();
+            this.entity = entity;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

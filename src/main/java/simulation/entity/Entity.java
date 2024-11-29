@@ -55,10 +55,9 @@ public abstract class Entity {
         return null;
     }
 
-    public void die() {
+    public synchronized void die() {
         if (!isAlive()) {
-            log.error("Tried to kill already died animal");
-            return;
+            throw new DeadEntityException(this);
         }
 
         log.debug("{} dies", this);

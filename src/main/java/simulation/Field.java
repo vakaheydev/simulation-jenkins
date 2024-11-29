@@ -23,26 +23,26 @@ public class Field {
             }
 
             public Pair decrease() {
-                return new Pair(real - 1, hash);
+                return new Pair(Math.max(0, real - 1), hash);
             }
         }
 
         private final Set<Entity> entityGroupSet;
-        private final Map<Class<? extends Entity>, Pair> entititesCntMap;
+        private final Map<Class<? extends Entity>, Pair> entitiesCntMap;
 
         public EntityGroup() {
             entityGroupSet = ConcurrentHashMap.newKeySet();
-            entititesCntMap = new ConcurrentHashMap<>();
+            entitiesCntMap = new ConcurrentHashMap<>();
         }
 
         public EntityGroup(EntityGroup group) {
             entityGroupSet = Set.copyOf(group.entityGroupSet);
-            entititesCntMap = Map.copyOf(group.entititesCntMap);
+            entitiesCntMap = Map.copyOf(group.entitiesCntMap);
         }
 
-        public void addEntity(Entity entity) {
+        public synchronized void addEntity(Entity entity) {
             entityGroupSet.add(entity);
-            entititesCntMap.compute(entity.getClass(), (k, v) -> {
+            entitiesCntMap.compute(entity.getClass(), (k, v) -> {
                 if (v == null) {
                     return new Pair(1, 1);
                 } else {
@@ -51,9 +51,9 @@ public class Field {
             });
         }
 
-        public void removeEntity(Entity entity) {
+        public synchronized void removeEntity(Entity entity) {
             entityGroupSet.remove(entity);
-            entititesCntMap.computeIfPresent(entity.getClass(), (k, v) -> v.decrease());
+            entitiesCntMap.computeIfPresent(entity.getClass(), (k, v) -> v.decrease());
         }
 
         public final List<Entity> getEntityList() {
@@ -61,12 +61,12 @@ public class Field {
         }
 
         public int entityCnt(Class<? extends Entity> clazz) {
-            Pair pair = entititesCntMap.get(clazz);
+            Pair pair = entitiesCntMap.get(clazz);
 
             return pair == null ? 0 : pair.real;
         }
 
-        public void iterate(Consumer<Entity> func) {
+        public synchronized void iterate(Consumer<Entity> func) {
             for (var entity : entityGroupSet) {
                 func.accept(entity);
             }
@@ -97,7 +97,7 @@ public class Field {
 
     public Field() {
         field = new EntityGroup[height][width];
-        entityList = new ArrayList<>();
+        entityList = Collections.synchronizedList(new ArrayList<>());
 
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[i].length; j++) {
@@ -106,12 +106,12 @@ public class Field {
         }
     }
 
-    public void addEntity(int x, int y, Entity entity) {
+    public synchronized void addEntity(int x, int y, Entity entity) {
         addEntityInternal(x, y, entity);
         increaseCounters(entity);
     }
 
-    public void removeEntity(Entity entity) {
+    public synchronized void removeEntity(Entity entity) {
         removeEntityInternal(entity);
         decreaseCounters(entity);
     }
@@ -142,7 +142,7 @@ public class Field {
         }
     }
 
-    public void decreaseCounters(Entity entity) {
+    private void decreaseCounters(Entity entity) {
         if (entity.isPlant()) {
             plantCnt.decrementAndGet();
         } else if (entity.isAnimal()) {
@@ -150,7 +150,7 @@ public class Field {
         }
     }
 
-    public void moveEntity(Point from, Point to, Entity entity) {
+    public synchronized void moveEntity(Point from, Point to, Entity entity) {
         checkEntity(entity);
         removeEntityInternal(entity);
         try {
@@ -218,12 +218,12 @@ public class Field {
         return plantCnt.get();
     }
 
-    public void clear() {
+    public synchronized void clear() {
         entityList.clear();
         for (EntityGroup[] entityGroups : field) {
             for (EntityGroup entityGroup : entityGroups) {
                 entityGroup.entityGroupSet.clear();
-                entityGroup.entititesCntMap.clear();
+                entityGroup.entitiesCntMap.clear();
             }
         }
         animalCnt.set(0);

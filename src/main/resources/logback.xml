@@ -5,7 +5,17 @@
         </encoder>
     </appender>
 
-    <root level="debug">
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>./logs/field_logs.txt</file>
+        <ImmediateFlush>true</ImmediateFlush>
+        <filter class="simulation.util.logging.MarkerFilter" />
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level -- [%marker] %class{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
     </root>
 </configuration>

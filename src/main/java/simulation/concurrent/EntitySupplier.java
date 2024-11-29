@@ -24,6 +24,7 @@ public class EntitySupplier extends AbstractEntityProcessor {
     @Override
     public void process() {
         Entity entity = supplier.get();
+
         log.debug("Supplied entity: {}", entity);
 
         try {

@@ -11,6 +11,7 @@ import simulation.util.Validations;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static simulation.entity.EntityConfig.getChanceToEat;
 import static simulation.util.PointUtil.getDirectionPoint;
@@ -56,8 +57,7 @@ public abstract class Animal extends Entity {
     }
 
     private boolean randomEat(double chance) {
-        Random rnd = new Random();
-
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
         return rnd.nextDouble() <= chance;
     }
 
@@ -110,26 +110,31 @@ public abstract class Animal extends Entity {
     }
 
     private void moveTo(Direction direction) {
-        Point directionPoint = getDirectionPoint(this.point, direction);
-        int x = directionPoint.x();
-        int y = directionPoint.y();
+        synchronized (field) {
+            checkDeath();
+            Point directionPoint = getDirectionPoint(this.point, direction);
+            int x = directionPoint.x();
+            int y = directionPoint.y();
 
-        List<Entity> entities = field.getEntityGroup(x, y).getEntityList();
+            List<Entity> entities = field.getEntityGroup(x, y).getEntityList();
 
-        log.debug("{} moving {} to {}", this, direction, directionPoint);
-        log.trace("EntityGroup in {}: {}", directionPoint, entities);
+            log.debug("{} moving {} to {}", this, direction, directionPoint);
+            log.trace("EntityGroup in {}: {}", directionPoint, entities);
 
-        field.moveEntity(point, new Point(x, y), this);
-        this.point = new Point(x, y);
+            field.moveEntity(point, new Point(x, y), this);
 
-        actOnEntityList(entities);
+            this.point = new Point(x, y);
 
-        if (isAlive()) {
-            loseWeight();
-            log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityList());
+            actOnEntityList(entities);
+
+            if (isAlive()) {
+                loseWeight();
+                log.trace("EntityGroup in {} after acting: {}", point, field.getEntityGroup(point).getEntityList());
+            }
+
+            checkDeath();
         }
 
-        checkDeath();
     }
 
     private void actOnEntityList(List<Entity> entities) {

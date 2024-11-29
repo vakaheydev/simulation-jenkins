@@ -6,49 +6,70 @@ import org.slf4j.MarkerFactory;
 import simulation.Field;
 import simulation.entity.Entity;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
+import java.util.concurrent.*;
 
 @Slf4j
 public class ConcurrentSimulation {
     private static final Marker IMPORTANT_MARKER = MarkerFactory.getMarker("IMPORTANT");
-//    public static void main(String[] args) {
-//        start();
-//    }
-//    public static void start() {
-//        Field field = new Field();
-//
-//        log.info(IMPORTANT_MARKER, "Started concurrent simulation");
-//
-//        BlockingQueue<Entity> queue = ConcurrentConfig.getBlockingQueue();
-//
-//        Thread worker = new Thread(new RandomMoveEntityWorker(field, queue), "worker_I");
-//        Thread worker2 = new Thread(new RandomMoveEntityWorker(field, queue), "worker_II");
-//        Thread worker3 = new Thread(new RandomMoveEntityWorker(field, queue), "worker_III");
-//        worker.start();
-//        worker2.start();
-//        worker3.start();
-//
-//        Thread supplier = new Thread(new InfiniteEntitySupplier(field, queue), "supplier");
-//        supplier.start();
-//
-//        while (true) {
-//            log.info(IMPORTANT_MARKER, field.toString());
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
 
-//        try {
-//            worker.join();
-//            worker2.join();
-//            worker3.join();
-//            supplier.join();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+    public static void main(String[] args) {
+        start();
+    }
 
-//        log.info("Ended concurrent simulation");
-//    }
+    public static void start() {
+        log.info("Started concurrent simulation");
+
+        Field field = new Field();
+        BlockingQueue<Entity> queue = ConcurrentConfig.getBlockingQueue();
+
+
+        ExecutorService es = Executors.newFixedThreadPool(8);
+        CompletionService<Void> ecs = new ExecutorCompletionService<>(es);
+
+        int nWorkers = 6, nSuppliers = 1;
+
+        Semaphore semaphore = new Semaphore(nWorkers);
+
+        for (int i = 0; i < nWorkers; i++) {
+            ecs.submit(() -> {
+                new RandomMoveEntityWorker(field, queue, semaphore).run();
+                return null;
+            });
+        }
+
+        for (int i = 0; i < nSuppliers; i++) {
+            ecs.submit(() -> {
+                new InfiniteEntitySupplier(field, queue, semaphore).run();
+                return null;
+            });
+        }
+
+        Runnable fieldChecker = () -> {
+            while (true) {
+                log.info(IMPORTANT_MARKER, field.shortToString());
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
+        ecs.submit(() -> {
+            fieldChecker.run();
+            return null;
+        });
+
+        for (int i = 0; i < nWorkers + nSuppliers + 1; i++) {
+            try {
+                ecs.take().get();
+            } catch (InterruptedException | ExecutionException e) {
+                es.shutdownNow();
+                throw new RuntimeException(e);
+            }
+        }
+
+        log.info("Ended concurrent simulation");
+    }
 }

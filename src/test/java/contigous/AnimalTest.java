@@ -14,6 +14,7 @@ import simulation.entity.animal.Plant;
 import simulation.entity.animal.predator.Bear;
 import simulation.entity.animal.predator.Eagle;
 import simulation.entity.animal.predator.Wolf;
+import util.TestAnimal;
 
 import java.util.List;
 
@@ -25,16 +26,6 @@ import static simulation.entity.animal.Animal.Direction.*;
 public class AnimalTest {
     private Field field;
 
-    static class NotHungryAnimal extends Eagle {
-        public NotHungryAnimal(Field field, int x, int y) {
-            super(field, x, y);
-        }
-
-        @Override
-        public void loseWeight() {
-        }
-    }
-
     @BeforeEach
     void setUp() {
         field = new Field();
@@ -43,7 +34,7 @@ public class AnimalTest {
     @DisplayName("Animal move")
     @Test
     public void shouldMove() {
-        var animal = new NotHungryAnimal(field, 5, 5);
+        var animal = new TestAnimal(field, 5, 5);
         assertMove(animal, UP);
         assertMove(animal, DOWN);
         assertMove(animal, LEFT);
