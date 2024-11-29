@@ -4,20 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import simulation.Field;
+import simulation.Simulation;
 import simulation.entity.Entity;
 
-import java.util.List;
 import java.util.concurrent.*;
 
 @Slf4j
-public class ConcurrentSimulation {
+public class ConcurrentSimulation implements Simulation {
     private static final Marker IMPORTANT_MARKER = MarkerFactory.getMarker("IMPORTANT");
 
-    public static void main(String[] args) {
-        start();
-    }
-
-    public static void start() {
+    @Override
+    public void start() {
         log.info("Started concurrent simulation");
 
         Field field = new Field();
