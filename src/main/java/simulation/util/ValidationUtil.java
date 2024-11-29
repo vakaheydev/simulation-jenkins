@@ -6,8 +6,8 @@ import simulation.exception.DeadEntityException;
 import simulation.exception.TooMuchEntitiesException;
 import simulation.exception.ValidationException;
 
-public class Validations {
-    private Validations() {
+public class ValidationUtil {
+    private ValidationUtil() {
     }
 
     public static void checkNotNull(Object obj) {

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static simulation.util.Validations.*;
+import static simulation.util.ValidationUtil.*;
 
 @Slf4j
 public class Field {

@@ -7,15 +7,14 @@ import simulation.entity.Point;
 import simulation.exception.AnimalSpeedLimitExceededException;
 import simulation.exception.DeadEntityException;
 import simulation.exception.TooMuchEntitiesException;
-import simulation.util.Validations;
+import simulation.util.ValidationUtil;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static simulation.entity.EntityConfig.getChanceToEat;
 import static simulation.util.PointUtil.getDirectionPoint;
-import static simulation.util.Validations.checkEntity;
+import static simulation.util.ValidationUtil.checkEntity;
 
 @Slf4j
 public abstract class Animal extends Entity {
@@ -93,7 +92,7 @@ public abstract class Animal extends Entity {
     }
 
     public void move(Direction... directions) {
-        Validations.checkNotNull(directions);
+        ValidationUtil.checkNotNull(directions);
         checkDeath();
 
         if (directions.length > speed()) {
