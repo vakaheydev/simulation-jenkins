@@ -1,6 +1,5 @@
-package simulation;
-
 import lombok.extern.slf4j.Slf4j;
+import simulation.Simulation;
 import simulation.concurrent.ConcurrentSimulation;
 
 @Slf4j
